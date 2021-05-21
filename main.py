@@ -19,7 +19,6 @@ RIGHT_VIEWPORT_MARGIN = 250
 BOTTOM_VIEWPORT_MARGIN = 50
 TOP_VIEWPORT_MARGIN = 100
 
-
 class MyGame(arcade.Window):
     """
     Main application class.
@@ -76,7 +75,7 @@ class MyGame(arcade.Window):
         #     wall.center_x = x
         #     wall.center_y = 32
         #     self.wall_list.append(wall)
-
+        
         for x in range(680, 1000, 64):
             wall = arcade.Sprite(":resources:images/tiles/grassMid.png", TILE_SCALING)
             wall.center_x = x
@@ -125,14 +124,14 @@ class MyGame(arcade.Window):
         self.player_list.draw()
 
         arcade.draw_text("10",
-                         900 + self.view_left, 400 + self.view_bottom,
-                         arcade.color.WHITE, 20)
+                        900 + self.view_left, 400 + self.view_bottom,
+                        arcade.color.WHITE, 20)
         arcade.draw_text("15",
-                         900 + self.view_left, 600 + self.view_bottom,
-                         arcade.color.WHITE, 20)
+                        900 + self.view_left, 600 + self.view_bottom,
+                        arcade.color.WHITE, 20)             
         arcade.draw_text("20",
-                         900 + self.view_left, 200 + self.view_bottom,
-                         arcade.color.WHITE, 20)
+                        900 + self.view_left, 200 + self.view_bottom,
+                        arcade.color.WHITE, 20)
 
     def on_key_press(self, key, modifiers):
         """Called whenever a key is pressed. """
