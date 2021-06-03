@@ -14,7 +14,7 @@ class Equation:
         # difficulty determines range and operation
         self.range = 10
         self.isAddition = True
-        self.isNegative = False
+        self.canBeNegative = False
 
         # just addition, numbers 10 or less
         if difficulty == 0:
@@ -39,7 +39,7 @@ class Equation:
         if difficulty == 3:
             if random.randrange(2):
                 self.isAddition = False
-                self.isNegative = True
+                self.canBeNegative = True
 
         """
         Deals with the actual equation. 
@@ -51,7 +51,7 @@ class Equation:
         self.problem = None 
         
         # no negative answers for difficulties 2 and below 
-        if self.isAddition == False and self.isNegative == False:
+        if self.isAddition == False and self.canBeNegative == False:
             # if the second is higher than the first, just swamp 'em
             if self.b > self.a:
                 temp = self.a
@@ -88,29 +88,36 @@ class Equation:
         # just add the answer to the unsolved version and return it
         self.problem = self.equationUnsolved() + str(self.c)
         return self.problem
-    
-    """
-    Returns the answer all by its lonesome.
-    """
-    def answer(self):
-        return self.c 
 
     """
-    Returns a randomly generated incorrect answer within the range.
+    Returns a set with the correct and incorrect answers together.
     """
-    def incorrect(self):
-        # make sure the number isn't the answer 
-        x = random.randrange(self.range)
-        while x == self.answer():
-            x = random.randrange(self.range)
-
-        # good to go 
-        return x
-
     def setAnswers(self, setPossible):
-        setPossible.add(self.answer())
-        for x in range(3):
-            setPossible.add(self.incorrect())
+        # add the correct answer
+        setPossible.add(self.c)
+
+        # now set up three incorrect answers
+
+        # first is one that's close to the original answer
+        if self.canBeNegative == False and self.c - 1 <= 0:
+            setPossible.add(self.c + 1)
+        else:
+            if random.randrange(0, 1):
+                setPossible.add(self.c + 1)
+            else:
+                setPossible.add(self.c - 1)
+
+        # second is one with the wrong operator 
+        if self.isAddition:
+            setPossible.add(self.a - self.b)
+        else:
+            setPossible.add(self.a + self.b)
+
+        # third is a random number
+        third = random.randrange(self.range)
+        while third == self.c:
+            third = random.randrange(self.range)
+        setPossible.add(third)
 
 
 
@@ -126,5 +133,7 @@ for answer in setPossible:
     print(answer)
 
 choice = input("> ")
+
+print(x.equationSolved())
 
 
