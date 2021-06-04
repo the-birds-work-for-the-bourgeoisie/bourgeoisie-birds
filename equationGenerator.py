@@ -1,7 +1,10 @@
 """
 Equation Generator
 
-This class will generate a random equation given a difficulty.
+This class will generate a random equation given a difficulty. This class only
+makes one random equation. To generate another one, you need to call another
+object of this class. In a loop, for example, you'd have to create another 
+Equation to have a new randomized equation. 
 """
 
 import random
@@ -9,7 +12,7 @@ import random
 class Equation:
     def __init__(self, difficulty):
         """
-        Deals with what sort of equation we're generating. 
+        Sets up difficulty of the equation. 
         """
         # difficulty determines range and operation
         self.range = 10
@@ -41,14 +44,21 @@ class Equation:
                 self.isAddition = False
                 self.canBeNegative = True
 
+        # addition/subtraction, numbers less than 20, answers can be negative 
+        if difficulty == 4:
+            self.range = 20
+            if random.randrange(2):
+                self.isAddition = False
+                self.canBeNegative = True
+
         """
-        Deals with the actual equation. 
+        Generates the equation based on difficulty.  
         """
         # initialize the operands 
         self.a = random.randrange(self.range)
         self.b = random.randrange(self.range)
         self.c = None
-        self.problem = None 
+        self.problem = None # will be used in later methods
         
         # no negative answers for difficulties 2 and below 
         if self.isAddition == False and self.canBeNegative == False:
@@ -119,21 +129,32 @@ class Equation:
             third = random.randrange(self.range)
         setPossible.add(third)
 
+"""
+EXAMPLE USAGE
+"""
 
+# this will loop four times
+for i in range(4):
 
-x = Equation(3)
+    # set up random equation and some possible answers
+    x = Equation(4)
+    setPossibleAnswers = set()
+    x.setAnswers(setPossibleAnswers)
 
-setPossible = set()
+    # display the equation to be solved
+    print("\nWhich is the answer?\n")
+    print(x.equationUnsolved(), "\n")
 
-x.setAnswers(setPossible)
+    # display some choices
+    for choice in setPossibleAnswers:
+        print(choice)
 
-print(x.equationUnsolved())
+    # get user input
+    userChoice = input(" > ")
 
-for answer in setPossible:
-    print(answer)
-
-choice = input("> ")
-
-print(x.equationSolved())
-
-
+    # check user input 
+    if int(userChoice) == x.c:
+        print("\nCorrect!")
+    else:
+        print("\nSorry, that's incorrect. The answer was " + str(x.c) + ".")
+        print(x.equationSolved())
