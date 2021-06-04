@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.5" tiledversion="1.6.0" orientation="orthogonal" renderorder="right-down" width="50" height="21" tilewidth="32" tileheight="32" infinite="0" backgroundcolor="#e6e6fa" nextlayerid="2" nextobjectid="1">
+ <tileset firstgid="1" source="stoneTiles.tsx"/>
+ <layer id="1" name="Tile Layer 1" width="50" height="21">
+  <data encoding="base64" compression="zlib">
+   eJztl0EKwCAMBKNiC83//9scLEhB2FTbiuzAQA4mJAcPG0QkAEbwnddsbube2ZsB67439OzS6iWEfI+aB+jMrHIHIaQN+sf1rwVBVrmDEDIPV2ZNznpUltUyNz2cFcuMe65E61FZtrZnzgmcPQSA
+  </data>
+ </layer>
+</map>
