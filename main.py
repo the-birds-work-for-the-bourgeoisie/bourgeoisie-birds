@@ -1,3 +1,4 @@
+from platform import platform
 import arcade
 
 SCREEN_WIDTH = 1000
@@ -64,54 +65,26 @@ class MyGame(arcade.Window):
         # Set up the player, specifically placing it at these coordinates.
         image_source = "pixelbird.GIF"
         self.player_sprite = arcade.Sprite(image_source, CHARACTER_SCALING)
-        self.player_sprite.center_x = 64
-        self.player_sprite.center_y = 128
+        self.player_sprite.center_x = 400
+        self.player_sprite.center_y = 200
         self.player_list.append(self.player_sprite)
 
-        # Create the ground
-        # This shows using a loop to place multiple sprites horizontally
-        # for x in range(0, 1250, 64):
-        #     wall = arcade.Sprite(":resources:images/tiles/grassMid.png", TILE_SCALING)
-        #     wall.center_x = x
-        #     wall.center_y = 32
-        #     self.wall_list.append(wall)
-        
-        for x in range(680, 1000, 64):
-            wall = arcade.Sprite(":resources:images/tiles/grassMid.png", TILE_SCALING)
-            wall.center_x = x
-            wall.center_y = 500
-            self.wall_list.append(wall)
+        map_name = "firstMap.tmx"
+        platforms_layer_name = "Tile Layer 1"
+        my_map = arcade.tilemap.read_tmx(map_name)
+        self.wall_list = arcade.tilemap.process_layer(map_object=my_map,
+                                                      layer_name=platforms_layer_name,
+                                                      scaling=1,
+                                                      use_spatial_hash=True)
 
-        for x in range(680, 1000, 64):
-            wall = arcade.Sprite(":resources:images/tiles/grassMid.png", TILE_SCALING)
-            wall.center_x = x
-            wall.center_y = 300
-            self.wall_list.append(wall)
-
-        # for x in range(680, 1000, 64):
-        #     wall = arcade.Sprite(":resources:images/tiles/grassMid.png", TILE_SCALING)
-        #     wall.center_x = x
-        #     wall.center_y = 500
-        #     self.wall_list.append(wall)
-
-        # Put some crates on the ground
-        # This shows using a coordinate list to place sprites
-        coordinate_list = [[512, 96],
-                           [256, 96],
-                           [768, 96]]
-
-        for coordinate in coordinate_list:
-            # Add a crate on the ground
-            wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", TILE_SCALING)
-            wall.position = coordinate
-            self.wall_list.append(wall)
-
-        # Use a loop to place some coins for our character to pick up
+        if my_map.background_color:
+            arcade.set_background_color(my_map.background_color)
 
         # Create the 'physics engine'
         self.physics_engine = arcade.PhysicsEnginePlatformer(self.player_sprite,
                                                              self.wall_list,
                                                              0)
+        
 
     def on_draw(self):
         """ Render the screen. """
@@ -140,9 +113,9 @@ class MyGame(arcade.Window):
             self.player_sprite.change_y = PLAYER_MOVEMENT_SPEED
         elif key == arcade.key.DOWN or key == arcade.key.S:
             self.player_sprite.change_y = -PLAYER_MOVEMENT_SPEED
-        elif key == arcade.key.LEFT or key == arcade.key.A:
+        elif key == arcade.key.LEFT:
             self.player_sprite.change_x = -PLAYER_MOVEMENT_SPEED
-        elif key == arcade.key.RIGHT or key == arcade.key.D:
+        elif key == arcade.key.RIGHT:
             self.player_sprite.change_x = PLAYER_MOVEMENT_SPEED
 
     def on_key_release(self, key, modifiers):
@@ -152,9 +125,9 @@ class MyGame(arcade.Window):
             self.player_sprite.change_y = 0
         elif key == arcade.key.DOWN or key == arcade.key.S:
             self.player_sprite.change_y = 0
-        elif key == arcade.key.LEFT or key == arcade.key.A:
+        elif key == arcade.key.LEFT:
             self.player_sprite.change_x = 0
-        elif key == arcade.key.RIGHT or key == arcade.key.D:
+        elif key == arcade.key.RIGHT:
             self.player_sprite.change_x = 0
 
     def update(self, delta_time):
@@ -164,11 +137,6 @@ class MyGame(arcade.Window):
         self.physics_engine.update()
 
         # --- Manage Scrolling ---
-
-        # Track if we need to change the viewport
-        # print(f"X - {self.player_sprite.center_x}, Y - {self.player_sprite.center_y}")
-        # if self.player_sprite.center_x > 694 and self.player_sprite.center_y > 380:
-        #     print("Made it")
 
         changed = False
 
@@ -207,6 +175,17 @@ class MyGame(arcade.Window):
                                 SCREEN_WIDTH + self.view_left,
                                 self.view_bottom,
                                 SCREEN_HEIGHT + self.view_bottom)
+
+        greatest = 0
+
+        for wall in self.wall_list:
+            wall.change_x = -3
+            if wall.center_x > greatest:
+                greatest = wall.center_x
+
+        for i in self.wall_list:
+            if i.center_x < -self.player_sprite._get_width() / 4:
+                i.center_x = greatest + (self.player_sprite._get_width() / 4)
 
 
 def main():
