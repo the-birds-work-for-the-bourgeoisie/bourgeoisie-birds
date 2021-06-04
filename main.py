@@ -63,7 +63,7 @@ class MyGame(arcade.Window):
         self.wall_list = arcade.SpriteList()
 
         # Set up the player, specifically placing it at these coordinates.
-        image_source = "pixelbird.GIF"
+        image_source = "assets-src/pixelbird.GIF"
         self.player_sprite = arcade.Sprite(image_source, CHARACTER_SCALING)
         self.player_sprite.center_x = 400
         self.player_sprite.center_y = 200
