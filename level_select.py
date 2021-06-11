@@ -2,19 +2,15 @@
 The level select screen.
 """
 # Import the needed modules
-from typing import Optional, Callable, List
-import random
 
 import arcade
 import arcade.gui
 from arcade.gui import UIManager
 
-# Define the constants
-from arcade.gui.ui_style import UIStyle
-
 from buttons.my_flat_button import MyFlatButton
-from level_select2 import LevelSelect2
-from main import MyGame
+from my_game_view import MyGame
+
+# Define the constants
 
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
@@ -115,18 +111,14 @@ class LevelSelect(arcade.View):
         arcade.draw_text("Level Select Screen", SCREEN_WIDTH - 600, SCREEN_HEIGHT - 150, arcade.color.PURPLE_MOUNTAIN_MAJESTY, font_size=40)
 
     def level1(self):
-        new_view = LevelSelect2()
+        new_view = MyGame(1)
         self.window.show_view(new_view)
 
     def level2(self):
-        new_view = LevelSelect2()
+        new_view = MyGame(2)
         self.window.show_view(new_view)
 
     def level3(self):
-        new_view = LevelSelect2()
+        new_view = MyGame(3)
         self.window.show_view(new_view)
 
-window = arcade.Window(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
-start_view = LevelSelect()
-window.show_view(start_view)
-arcade.run()

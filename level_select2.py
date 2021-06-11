@@ -2,15 +2,12 @@
 The level select screen.
 """
 # Import the needed modules
-from typing import Optional, Callable, List
-import random
 
 import arcade
 import arcade.gui
 from arcade.gui import UIManager
 
 # Define the constants
-from arcade.gui.ui_style import UIStyle
 
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
