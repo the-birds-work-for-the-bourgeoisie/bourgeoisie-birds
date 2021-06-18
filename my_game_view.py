@@ -1,5 +1,5 @@
 import arcade
-
+import random
 
 # Constants used to scale our sprites from their original size
 from constants import SCREEN_WIDTH, SCREEN_HEIGHT
@@ -31,7 +31,7 @@ class MyGame(arcade.View):
         # These are 'lists' that keep track of our sprites. Each sprite should
         # go into a list.
         self.wall_list = None
-        self.player_list = None
+        self.barrier = None
 
         # Separate variable that holds the player sprite
         self.player_sprite = None
@@ -58,15 +58,14 @@ class MyGame(arcade.View):
         self.view_left = 0
 
         # Create the Sprite lists
-        self.player_list = arcade.SpriteList()
         self.wall_list = arcade.SpriteList()
 
         # Set up the player, specifically placing it at these coordinates.
         image_source = "assets-target/pixelbird/pixelbird0.png"
         self.player_sprite = arcade.Sprite(image_source, CHARACTER_SCALING)
         self.player_sprite.center_x = 400
-        self.player_sprite.center_y = 200
-        self.player_list.append(self.player_sprite)
+        self.player_sprite.center_y = 150
+        self.player_sprite.change_x = PLAYER_MOVEMENT_SPEED
 
         map_name = "firstMap.tmx"
         platforms_layer_name = "Tile Layer 1"
@@ -78,6 +77,11 @@ class MyGame(arcade.View):
 
         if my_map.background_color:
             arcade.set_background_color(my_map.background_color)
+
+        self.barrier = arcade.Sprite(":resources:images/items/coinGold.png", COIN_SCALING)
+        self.barrier.center_x = 1000
+        self.barrier.center_y = 150
+        # self.barrier.alpha = 0
 
         # Create the 'physics engine'
         self.physics_engine = arcade.PhysicsEnginePlatformer(self.player_sprite,
@@ -92,7 +96,8 @@ class MyGame(arcade.View):
 
         # Draw our sprites
         self.wall_list.draw()
-        self.player_list.draw()
+        self.player_sprite.draw()
+        self.barrier.draw()
 
         arcade.draw_text("10",
                          900 + self.view_left, 400 + self.view_bottom,
@@ -150,18 +155,6 @@ class MyGame(arcade.View):
             self.view_left += self.player_sprite.right - right_boundary
             changed = True
 
-        # Scroll up
-        top_boundary = self.view_bottom + SCREEN_HEIGHT - TOP_VIEWPORT_MARGIN
-        if self.player_sprite.top > top_boundary:
-            self.view_bottom += self.player_sprite.top - top_boundary
-            changed = True
-
-        # Scroll down
-        bottom_boundary = self.view_bottom + BOTTOM_VIEWPORT_MARGIN
-        if self.player_sprite.bottom < bottom_boundary:
-            self.view_bottom -= bottom_boundary - self.player_sprite.bottom
-            changed = True
-
         if changed:
             # Only scroll to integers. Otherwise we end up with pixels that
             # don't line up on the screen
@@ -177,10 +170,13 @@ class MyGame(arcade.View):
         greatest = 0
 
         for wall in self.wall_list:
-            wall.change_x = -3
             if wall.center_x > greatest:
                 greatest = wall.center_x
 
-        for i in self.wall_list:
-            if i.center_x < -self.player_sprite._get_width() / 4:
-                i.center_x = greatest + (self.player_sprite._get_width() / 4)
+        for wall in self.wall_list:
+            if wall.center_x < self.player_sprite.center_x - 800:
+                wall.center_x = greatest + (self.player_sprite._get_width() / 4)
+
+        if arcade.check_for_collision(self.player_sprite, self.barrier):
+            self.barrier.center_x += 1250
+            self.barrier.center_y = random.choice([150, 350, 550])
