@@ -42,7 +42,7 @@ class LevelSelect(arcade.View):
         button = MyFlatButton(
             app=self,
             text='Level 3',
-            center_x=right_column_x + 75,
+            center_x=750,
             center_y=y_slot * 1,
             width=250,
             height=100
@@ -65,7 +65,7 @@ class LevelSelect(arcade.View):
         button = MyFlatButton(
             app=self,
             text='Level 2',
-            center_x=right_column_x - 200,
+            center_x=500,
             center_y=y_slot * 1,
             width=250,
             height=100
@@ -87,7 +87,7 @@ class LevelSelect(arcade.View):
         # Button for level 1
         button = MyFlatButton(
             text='Level 1',
-            center_x=right_column_x - 475,
+            center_x=250,
             center_y=y_slot * 1,
             width=250,
             height=100
@@ -108,7 +108,7 @@ class LevelSelect(arcade.View):
 
     def on_draw(self):
         arcade.start_render()
-        arcade.draw_text("Level Select Screen", SCREEN_WIDTH - 600, SCREEN_HEIGHT - 150, arcade.color.PURPLE_MOUNTAIN_MAJESTY, font_size=40)
+        arcade.draw_text("Level Select Screen", 305, 475, arcade.color.PURPLE_MOUNTAIN_MAJESTY, font_size=40)
 
     def level1(self):
         new_view = MyGame(1)
