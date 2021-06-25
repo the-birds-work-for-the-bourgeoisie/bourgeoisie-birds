@@ -2,6 +2,8 @@ import arcade
 import random
 
 # Constants used to scale our sprites from their original size
+from arcade import SpriteList
+
 from constants import SCREEN_WIDTH, SCREEN_HEIGHT
 from sprites.answer import Answer
 from sprites.bird import Bird
@@ -33,7 +35,7 @@ class MyGame(arcade.View):
         # These are 'lists' that keep track of our sprites. Each sprite should
         # go into a list.
         self.wall_list = None
-        self.barrier = None
+        self.answer_sprites = SpriteList()
 
         # Separate variable that holds the player sprite
         self.player_sprite = None
@@ -80,11 +82,13 @@ class MyGame(arcade.View):
         if my_map.background_color:
             arcade.set_background_color(my_map.background_color)
 
-        self.barrier = Answer(COIN_SCALING)
-        self.barrier.center_x = 1000
-        self.barrier.center_y = 150
-        self.barrier.set_number(20)
-        # self.barrier.alpha = 0
+        ys = [150, 350, 550]
+        for i in range(3):
+            answer = Answer(COIN_SCALING)
+            answer.center_x = 1000
+            answer.center_y = ys[i]
+            answer.set_number(20)
+            self.answer_sprites.append(answer)
 
         # Create the 'physics engine'
         self.physics_engine = arcade.PhysicsEnginePlatformer(self.player_sprite,
@@ -100,7 +104,7 @@ class MyGame(arcade.View):
         # Draw our sprites
         self.wall_list.draw()
         self.player_sprite.draw()
-        self.barrier.draw()
+        self.answer_sprites.draw()
 
         arcade.draw_text("10",
                          900 + self.view_left, 400 + self.view_bottom,
@@ -185,7 +189,23 @@ class MyGame(arcade.View):
             if wall.center_x < self.player_sprite.center_x - 800:
                 wall.center_x = greatest + (self.player_sprite._get_width() / 4)
 
-        if arcade.check_for_collision(self.player_sprite, self.barrier):
-            self.barrier.center_x += 1250
-            self.barrier.center_y = random.choice([150, 350, 550])
-            self.barrier.set_number(random.choice(list(range(-100, 100))))
+        if answers := arcade.check_for_collision_with_list(self.player_sprite, self.answer_sprites):
+            # check if player hit the correct answer
+            is_correct = False
+            for answer in answers:
+                if type(answer) == Answer:
+                    a: Answer = answer
+                    if a.is_correct:
+                        is_correct = True
+
+            # player hit the correct answer
+            if is_correct:
+                pass
+
+            # move and reset answers
+            for answer in self.answer_sprites:
+                if type(answer) == Answer:
+                    a: Answer = answer
+                    a.center_x += 1250
+                    a.set_number(random.choice(list(range(-100, 100))))
+                    a.is_correct = False
