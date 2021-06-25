@@ -6,6 +6,8 @@ import numpy as np
 # check for windows
 from PIL.GifImagePlugin import GifImageFile
 
+from utils import file_utils
+
 slash = "\\" if os.name == 'nt' else "/"
 current_folder = ""
 src_folder = "assets-src" + slash
@@ -33,11 +35,9 @@ def convert_frame_to_transparent(imageObject: GifImageFile) -> Image:
 
 def convert_gifs():
     # maintains folder structure
-    path_list = []
-    path_list.extend(Path(current_folder + src_folder).glob('**/*.' + src_type.upper()))
-    path_list.extend(Path(current_folder + src_folder).glob('**/*.' + src_type.lower()))
+    path_list = file_utils.get_files_in_folder_by_file_extension(current_folder + src_folder, src_type)
     for path in path_list:
-
+        print("Converting", path.name, "...")
         # find GIFs and create folder destinations
         src_file = str(path)
         target_file = src_file.replace(src_folder, current_folder + target_folder)
@@ -53,6 +53,7 @@ def convert_gifs():
             destination_file = '%s-%d.%s' % (target_file_prefix, frame, target_type)
             rgbaImage = convert_frame_to_transparent(imageObject)
             rgbaImage.save(destination_file)
+            print("Saved", destination_file)
 
 
 convert_gifs()

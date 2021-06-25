@@ -3,6 +3,7 @@ import random
 
 # Constants used to scale our sprites from their original size
 from constants import SCREEN_WIDTH, SCREEN_HEIGHT
+from sprites.bird import Bird
 
 CHARACTER_SCALING = 1
 TILE_SCALING = 0.5
@@ -61,8 +62,8 @@ class MyGame(arcade.View):
         self.wall_list = arcade.SpriteList()
 
         # Set up the player, specifically placing it at these coordinates.
-        image_source = "assets-target/pixelbird/pixelbird0.png"
-        self.player_sprite = arcade.Sprite(image_source, CHARACTER_SCALING)
+        image_source = "assets-target/pixelbird2/"
+        self.player_sprite = Bird(image_source, CHARACTER_SCALING)
         self.player_sprite.center_x = 400
         self.player_sprite.center_y = 150
         self.player_sprite.change_x = PLAYER_MOVEMENT_SPEED
@@ -132,6 +133,11 @@ class MyGame(arcade.View):
             self.player_sprite.change_x = 0
         elif key == arcade.key.RIGHT:
             self.player_sprite.change_x = 0
+
+    def on_update(self, delta_time: float):
+
+        # --- Manage Animations ---
+        self.player_sprite.on_update(delta_time)
 
     def update(self, delta_time):
         """ Movement and game logic """
