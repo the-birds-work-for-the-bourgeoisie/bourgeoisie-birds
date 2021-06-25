@@ -2,7 +2,11 @@ import arcade
 import random
 
 # Constants used to scale our sprites from their original size
+from arcade import SpriteList
+
 from constants import SCREEN_WIDTH, SCREEN_HEIGHT
+from sprites.answer import Answer
+from sprites.bird import Bird
 
 CHARACTER_SCALING = 1
 TILE_SCALING = 0.5
@@ -31,7 +35,7 @@ class MyGame(arcade.View):
         # These are 'lists' that keep track of our sprites. Each sprite should
         # go into a list.
         self.wall_list = None
-        self.barrier = None
+        self.answer_sprites = SpriteList()
 
         # Separate variable that holds the player sprite
         self.player_sprite = None
@@ -61,8 +65,8 @@ class MyGame(arcade.View):
         self.wall_list = arcade.SpriteList()
 
         # Set up the player, specifically placing it at these coordinates.
-        image_source = "assets-target/pixelbird/pixelbird0.png"
-        self.player_sprite = arcade.Sprite(image_source, CHARACTER_SCALING)
+        image_source = "assets-target/pixelbird2/"
+        self.player_sprite = Bird(image_source, CHARACTER_SCALING)
         self.player_sprite.center_x = 400
         self.player_sprite.center_y = 150
         self.player_sprite.change_x = PLAYER_MOVEMENT_SPEED
@@ -78,10 +82,13 @@ class MyGame(arcade.View):
         if my_map.background_color:
             arcade.set_background_color(my_map.background_color)
 
-        self.barrier = arcade.Sprite(":resources:images/items/coinGold.png", COIN_SCALING)
-        self.barrier.center_x = 1000
-        self.barrier.center_y = 150
-        # self.barrier.alpha = 0
+        ys = [150, 350, 550]
+        for i in range(3):
+            answer = Answer(COIN_SCALING)
+            answer.center_x = 1000
+            answer.center_y = ys[i]
+            answer.set_number(20)
+            self.answer_sprites.append(answer)
 
         # Create the 'physics engine'
         self.physics_engine = arcade.PhysicsEnginePlatformer(self.player_sprite,
@@ -97,7 +104,7 @@ class MyGame(arcade.View):
         # Draw our sprites
         self.wall_list.draw()
         self.player_sprite.draw()
-        self.barrier.draw()
+        self.answer_sprites.draw()
 
         arcade.draw_text("10",
                          900 + self.view_left, 400 + self.view_bottom,
@@ -132,6 +139,11 @@ class MyGame(arcade.View):
             self.player_sprite.change_x = 0
         elif key == arcade.key.RIGHT:
             self.player_sprite.change_x = 0
+
+    def on_update(self, delta_time: float):
+
+        # --- Manage Animations ---
+        self.player_sprite.on_update(delta_time)
 
     def update(self, delta_time):
         """ Movement and game logic """
@@ -177,6 +189,23 @@ class MyGame(arcade.View):
             if wall.center_x < self.player_sprite.center_x - 800:
                 wall.center_x = greatest + (self.player_sprite._get_width() / 4)
 
-        if arcade.check_for_collision(self.player_sprite, self.barrier):
-            self.barrier.center_x += 1250
-            self.barrier.center_y = random.choice([150, 350, 550])
+        if answers := arcade.check_for_collision_with_list(self.player_sprite, self.answer_sprites):
+            # check if player hit the correct answer
+            is_correct = False
+            for answer in answers:
+                if type(answer) == Answer:
+                    a: Answer = answer
+                    if a.is_correct:
+                        is_correct = True
+
+            # player hit the correct answer
+            if is_correct:
+                pass
+
+            # move and reset answers
+            for answer in self.answer_sprites:
+                if type(answer) == Answer:
+                    a: Answer = answer
+                    a.center_x += 1250
+                    a.set_number(random.choice(list(range(-100, 100))))
+                    a.is_correct = False
