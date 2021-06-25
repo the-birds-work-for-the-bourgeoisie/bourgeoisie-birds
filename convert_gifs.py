@@ -1,8 +1,11 @@
 from pathlib import Path
 import os
 from PIL import Image
+import numpy as np
 
 # check for windows
+from PIL.GifImagePlugin import GifImageFile
+
 slash = "\\" if os.name == 'nt' else "/"
 current_folder = ""
 src_folder = "assets-src" + slash
@@ -11,25 +14,45 @@ src_type = "GIF"
 target_type = "png"
 
 
+def convert_frame_to_transparent(imageObject: GifImageFile) -> Image:
+    """
+    https://stackoverflow.com/questions/3752476/python-pil-replace-a-single-rgba-color
+    replaces #FFFFFF (white) with #00000000 (clear)
+    """
+    rgbaImage: Image = imageObject.convert('RGBA')
+
+    data = np.array(rgbaImage)  # "data" is a height x width x 4 numpy array
+    red, green, blue, alpha = data.T  # Temporarily unpack the bands for readability
+
+    # Replace white with red... (leaves alpha values alone...)
+    white_areas = (red == 255) & (blue == 255) & (green == 255)
+    data[...][white_areas.T] = (0, 0, 0, 0)  # Transpose back needed
+
+    return Image.fromarray(data)
+
+
 def convert_gifs():
     # maintains folder structure
-    path_list = Path(current_folder + src_folder).glob('**/*.' + src_type)
+    path_list = []
+    path_list.extend(Path(current_folder + src_folder).glob('**/*.' + src_type.upper()))
+    path_list.extend(Path(current_folder + src_folder).glob('**/*.' + src_type.lower()))
     for path in path_list:
 
         # find GIFs and create folder destinations
         src_file = str(path)
         target_file = src_file.replace(src_folder, current_folder + target_folder)
-        target_file = target_file.replace("." + src_type, "")
+        target_file = target_file.replace("." + src_type.upper(), "")
+        target_file = target_file.replace("." + src_type.lower(), "")
         Path(target_file).mkdir(parents=True, exist_ok=True)
         target_file_prefix = target_file + slash + os.path.basename(target_file)
 
         # convert the GIF
-        imageObject = Image.open(src_file)
+        imageObject: GifImageFile = Image.open(src_file)
         for frame in range(0, imageObject.n_frames):
             imageObject.seek(frame)
-            destination_file = '%s%d.%s' % (target_file_prefix, frame, target_type)
-            print(destination_file)
-            imageObject.save(destination_file)
+            destination_file = '%s-%d.%s' % (target_file_prefix, frame, target_type)
+            rgbaImage = convert_frame_to_transparent(imageObject)
+            rgbaImage.save(destination_file)
 
 
 convert_gifs()
