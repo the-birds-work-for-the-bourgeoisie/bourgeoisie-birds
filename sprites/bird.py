@@ -1,5 +1,4 @@
 import arcade
-from pathlib import Path
 
 from constants import BIRD_SCALING, BIRD_ANIMATION_FPS
 from utils import file_utils
@@ -12,7 +11,6 @@ class Bird(arcade.Sprite):
         super().__init__(scale=scale)
 
         # settings
-        self.scale = BIRD_SCALING
         self.animation_fps = BIRD_ANIMATION_FPS
         self.textures = []
         path_list = file_utils.get_files_in_folder_by_file_extension(folder_name, "png")

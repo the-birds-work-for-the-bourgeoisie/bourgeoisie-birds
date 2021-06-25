@@ -3,6 +3,7 @@ import random
 
 # Constants used to scale our sprites from their original size
 from constants import SCREEN_WIDTH, SCREEN_HEIGHT
+from sprites.answer import Answer
 from sprites.bird import Bird
 
 CHARACTER_SCALING = 1
@@ -79,9 +80,10 @@ class MyGame(arcade.View):
         if my_map.background_color:
             arcade.set_background_color(my_map.background_color)
 
-        self.barrier = arcade.Sprite(":resources:images/items/coinGold.png", COIN_SCALING)
+        self.barrier = Answer(COIN_SCALING)
         self.barrier.center_x = 1000
         self.barrier.center_y = 150
+        self.barrier.set_number(20)
         # self.barrier.alpha = 0
 
         # Create the 'physics engine'
@@ -186,3 +188,4 @@ class MyGame(arcade.View):
         if arcade.check_for_collision(self.player_sprite, self.barrier):
             self.barrier.center_x += 1250
             self.barrier.center_y = random.choice([150, 350, 550])
+            self.barrier.set_number(random.choice(list(range(-100, 100))))
