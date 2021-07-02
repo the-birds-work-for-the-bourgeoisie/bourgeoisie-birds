@@ -3,6 +3,7 @@ import arcade
 from constants import SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE
 from level_select import LevelSelect
 
+
 def main():
     """ Main method """
 
