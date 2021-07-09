@@ -8,6 +8,8 @@ from constants import SCREEN_WIDTH, SCREEN_HEIGHT
 from sprites.answer import Answer
 from sprites.bird import Bird
 
+from background_handler import Background
+
 CHARACTER_SCALING = 1
 TILE_SCALING = 0.5
 COIN_SCALING = 0.5
@@ -35,6 +37,7 @@ class MyGame(arcade.View):
         # These are 'lists' that keep track of our sprites. Each sprite should
         # go into a list.
         self.wall_list = None
+        self.bg_list = Background(PLAYER_MOVEMENT_SPEED, self.level)
         self.answer_sprites = SpriteList()
 
         # Separate variable that holds the player sprite
@@ -102,6 +105,7 @@ class MyGame(arcade.View):
         arcade.start_render()
 
         # Draw our sprites
+        self.bg_list.draw()
         self.wall_list.draw()
         self.player_sprite.draw()
         self.answer_sprites.draw()
@@ -150,6 +154,9 @@ class MyGame(arcade.View):
 
         # Move the player with the physics engine
         self.physics_engine.update()
+
+        # Update the backgrounds using the player as a reference point
+        self.bg_list.update(self.player_sprite.center_x)
 
         # --- Manage Scrolling ---
 
