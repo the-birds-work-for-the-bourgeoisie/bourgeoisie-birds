@@ -128,33 +128,4 @@ class Equation:
         while third == self.c:
             third = random.randrange(self.range)
         setPossible.add(third)
-
-"""
-EXAMPLE USAGE
-"""
-
-# this will loop four times
-for i in range(4):
-
-    # set up random equation and some possible answers
-    x = Equation(4)
-    setPossibleAnswers = set()
-    x.setAnswers(setPossibleAnswers)
-
-    # display the equation to be solved
-    print("\nWhich is the answer?\n")
-    print(x.equationUnsolved(), "\n")
-
-    # display some choices
-    for choice in setPossibleAnswers:
-        print(choice)
-
-    # get user input
-    userChoice = input(" > ")
-
-    # check user input 
-    if int(userChoice) == x.c:
-        print("\nCorrect!")
-    else:
-        print("\nSorry, that's incorrect. The answer was " + str(x.c) + ".")
-        print(x.equationSolved())
+        
