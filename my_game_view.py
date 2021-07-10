@@ -50,6 +50,9 @@ class MyGame(arcade.View):
         self.view_bottom = 0
         self.view_left = 0
 
+        # keeps track of the player sprite's location from previous frame
+        self.player_last_x = 0
+
         # Load sounds
         self.collect_coin_sound = arcade.load_sound(":resources:sounds/coin1.wav")
         self.jump_sound = arcade.load_sound(":resources:sounds/jump1.wav")
@@ -151,12 +154,15 @@ class MyGame(arcade.View):
 
     def update(self, delta_time):
         """ Movement and game logic """
+        # record the player's last location to get their true speed
+        self.player_last_x = self.player_sprite.center_x
 
         # Move the player with the physics engine
         self.physics_engine.update()
 
-        # Update the backgrounds using the player as a reference point
-        self.bg_list.update(self.player_sprite.center_x)
+        # get player's speed and update backgrounds
+        player_speed = self.player_sprite.center_x - self.player_last_x
+        self.bg_list.update(player_speed, self.player_sprite.center_x)
 
         # --- Manage Scrolling ---
 
