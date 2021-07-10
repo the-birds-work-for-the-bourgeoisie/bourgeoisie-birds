@@ -1,5 +1,6 @@
 """
 Equation Generator
+Author: Grant Williams
 
 This class will generate a random equation given a difficulty. This class only
 makes one random equation. To generate a new equation with new numbers and
