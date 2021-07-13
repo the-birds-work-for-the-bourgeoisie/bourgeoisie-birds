@@ -8,7 +8,7 @@ class make_wall:
         self.number_2_choice = numbers[1]
         self.number_3_choice = numbers[2]
         self.wall =  Image.new('RGB', (240,650))
-        self.path = "birds_game_wall/"
+        self.path = "bourgeoisie-birds/birds_game_wall/"
         self.file = filename
         self.choice = choice
         self.wall_done = wall_done
