@@ -15,7 +15,7 @@ class Background(arcade.Sprite):
     """ 
     __init__ - sets up our background sprites
     """
-    def __init__(self, speed, level):
+    def __init__(self, default_player_speed, level):
         # creates a new Sprite 
         super().__init__()
 
@@ -37,51 +37,60 @@ class Background(arcade.Sprite):
             self.theme = "dawn"
 
         # set up file sources as dictated by previous if-else block 
-        bg_sky = "assets-src/bg_{}_0.png"
-        bg_sky = bg_sky.format(self.theme)
-        bg_skyline = "assets-src/bg_{}_1.png"
-        bg_skyline = bg_skyline.format(self.theme)
-        bg_buildings = "assets-src/bg_{}_2.png"
-        bg_buildings = bg_buildings.format(self.theme)
+        bg_sky_img = "assets-src/bg_{}_0.png"
+        bg_sky_img = bg_sky_img.format(self.theme)
+        bg_skyline_img = "assets-src/bg_{}_1.png"
+        bg_skyline_img = bg_skyline_img.format(self.theme)
+        bg_buildings_img = "assets-src/bg_{}_2.png"
+        bg_buildings_img = bg_buildings_img.format(self.theme)
 
-        # set up two sky (back) images
-        bg_sprite = arcade.Sprite(bg_sky)
-        bg_sprite.center_x = 1000
-        bg_sprite.center_y = 325
-        bg_sprite.change_x = speed - 0.5
-        self.bg_sky_list.append(bg_sprite)
-        # needs to be repeated to ensure second copy is made
-        bg_sprite = arcade.Sprite(bg_sky)
-        bg_sprite.center_x = -1000
-        bg_sprite.center_y = 325
-        bg_sprite.change_x = speed - 0.5
-        self.bg_sky_list.append(bg_sprite)
+        # set up speeds for each background layer
+        self.default_player_speed = default_player_speed
+        bg_speed_0 = self.default_player_speed * 0.90 # 90% of player speed
+        bg_speed_1 = self.default_player_speed * 0.80 # 80% of player speed
+        bg_speed_2 = self.default_player_speed * 0.60 # 60% of player speed
 
-        # set up two skyline (middle) images
-        bg_sprite = arcade.Sprite(bg_skyline)
-        bg_sprite.center_x = 1000
-        bg_sprite.center_y = 325
-        bg_sprite.change_x = speed - 1.5
-        self.bg_skyline_list.append(bg_sprite) 
-        # needs to be repeated to ensure second copy is made
-        bg_sprite = arcade.Sprite(bg_skyline)
-        bg_sprite.center_x = -1000
-        bg_sprite.center_y = 325
-        bg_sprite.change_x = speed - 1.5
-        self.bg_skyline_list.append(bg_sprite) 
+        # set up first sky (back) image
+        bg_sprite_0a = arcade.Sprite(bg_sky_img)
+        bg_sprite_0a.center_x = 1000
+        bg_sprite_0a.center_y = 325
+        bg_sprite_0a.change_x = bg_speed_0
+        self.bg_sky_list.append(bg_sprite_0a)
 
-        # set up two building (front) images 
-        bg_sprite = arcade.Sprite(bg_buildings)
-        bg_sprite.center_x = 1000
-        bg_sprite.center_y = 325
-        bg_sprite.change_x = speed - 2
-        self.bg_building_list.append(bg_sprite) 
-        # needs to be repeated to ensure second copy is made
-        bg_sprite = arcade.Sprite(bg_buildings)
-        bg_sprite.center_x = -1000
-        bg_sprite.center_y = 325
-        bg_sprite.change_x = speed - 2
-        self.bg_building_list.append(bg_sprite)
+        # set up second sky (back) image
+        bg_sprite_0b = arcade.Sprite(bg_sky_img)
+        bg_sprite_0b.center_x = -1000
+        bg_sprite_0b.center_y = 325
+        bg_sprite_0b.change_x = bg_speed_0
+        self.bg_sky_list.append(bg_sprite_0b)
+
+        # set up first skyline (middle) image
+        bg_sprite_1a = arcade.Sprite(bg_skyline_img)
+        bg_sprite_1a.center_x = 1000
+        bg_sprite_1a.center_y = 325
+        bg_sprite_1a.change_x = bg_speed_1
+        self.bg_skyline_list.append(bg_sprite_1a) 
+
+        # set up second skyline (middle) image
+        bg_sprite_1b = arcade.Sprite(bg_skyline_img)
+        bg_sprite_1b.center_x = -1000
+        bg_sprite_1b.center_y = 325
+        bg_sprite_1b.change_x = bg_speed_1
+        self.bg_skyline_list.append(bg_sprite_1b) 
+
+        # set up first building (front) image 
+        bg_sprite_2a = arcade.Sprite(bg_buildings_img)
+        bg_sprite_2a.center_x = 1000
+        bg_sprite_2a.center_y = 325
+        bg_sprite_2a.change_x = bg_speed_2
+        self.bg_building_list.append(bg_sprite_2a) 
+
+        # set up second building (front) image 
+        bg_sprite_2b = arcade.Sprite(bg_buildings_img)
+        bg_sprite_2b.center_x = -1000
+        bg_sprite_2b.center_y = 325
+        bg_sprite_2b.change_x = bg_speed_2
+        self.bg_building_list.append(bg_sprite_2b)
 
         # combine all backgrounds into one nice list for later 
         self.bg_all_list.extend(self.bg_sky_list)
@@ -95,16 +104,16 @@ class Background(arcade.Sprite):
     def update(self, player_speed, player_location):
 
         # if the player is moving, all backgrounds can move
-        if player_speed == 5:
+        if player_speed == self.default_player_speed:
             for sprite in self.bg_all_list:
                 sprite.center_x += sprite.change_x
 
         # if the player isn't moving (aka dead), only the sky should move
         elif player_speed == 0:
             for sprite in self.bg_sky_list:
-                # speed is now -0.5 (instead of 4.5) to match its apparent 
-                # speed from the player's perspective 
-                sprite.center_x += sprite.change_x - 5
+                # speed is now -0.15 to simulate leisurely-moving clouds 
+                # while the camera is not moving 
+                sprite.center_x += -0.15
 
         """
         A visual for the background images' unique updating.
