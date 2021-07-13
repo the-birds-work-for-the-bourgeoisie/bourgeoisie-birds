@@ -2,7 +2,13 @@ import arcade
 import random
 
 # Constants used to scale our sprites from their original size
+from arcade import SpriteList
+
 from constants import SCREEN_WIDTH, SCREEN_HEIGHT
+from sprites.answer import Answer
+from sprites.bird import Bird
+
+from background_handler import Background
 
 CHARACTER_SCALING = 1
 TILE_SCALING = 0.5
@@ -31,7 +37,9 @@ class MyGame(arcade.View):
         # These are 'lists' that keep track of our sprites. Each sprite should
         # go into a list.
         self.wall_list = None
-        self.coin = None
+
+        self.bg_list = None
+        self.answer_sprites = SpriteList()
 
         # Separate variable that holds the player sprite
         self.player_sprite = None
@@ -42,6 +50,9 @@ class MyGame(arcade.View):
         # Used to keep track of our scrolling
         self.view_bottom = 0
         self.view_left = 0
+
+        # keeps track of the player sprite's location from previous frame
+        self.player_last_x = 0
 
         # Load sounds
         self.collect_coin_sound = arcade.load_sound(":resources:sounds/coin1.wav")
@@ -59,10 +70,11 @@ class MyGame(arcade.View):
 
         # Create the Sprite lists
         self.wall_list = arcade.SpriteList()
+        self.bg_list = Background(PLAYER_MOVEMENT_SPEED, self.level)
 
         # Set up the player, specifically placing it at these coordinates.
-        image_source = "assets-target/pixelbird/pixelbird0.png"
-        self.player_sprite = arcade.Sprite(image_source, CHARACTER_SCALING)
+        image_source = "assets-target/pixelbird2/"
+        self.player_sprite = Bird(image_source, CHARACTER_SCALING)
         self.player_sprite.center_x = 400
         self.player_sprite.center_y = 150
         self.player_sprite.change_x = PLAYER_MOVEMENT_SPEED
@@ -84,11 +96,14 @@ class MyGame(arcade.View):
         if my_map.background_color:
             arcade.set_background_color(my_map.background_color)
 
-        # Add coin for player to pass through
-        self.coin = arcade.Sprite(":resources:images/items/coinGold.png", COIN_SCALING)
-        self.coin.center_x = 1000
-        self.coin.center_y = 150
-        # self.coin.alpha = 0
+
+        ys = [150, 350, 550]
+        for i in range(3):
+            answer = Answer(COIN_SCALING)
+            answer.center_x = 1000
+            answer.center_y = ys[i]
+            answer.set_number(20)
+            self.answer_sprites.append(answer)
 
         # Create the 'physics engine'
         self.physics_engine = arcade.PhysicsEnginePlatformer(self.player_sprite,
@@ -102,9 +117,10 @@ class MyGame(arcade.View):
         arcade.start_render()
 
         # Draw our sprites
+        self.bg_list.draw()
         self.wall_list.draw()
         self.player_sprite.draw()
-        self.coin.draw()
+        self.answer_sprites.draw()
 
         arcade.draw_text("10",
                          900 + self.view_left, 400 + self.view_bottom,
@@ -140,11 +156,22 @@ class MyGame(arcade.View):
         elif key == arcade.key.RIGHT:
             self.player_sprite.change_x = 0
 
+    def on_update(self, delta_time: float):
+
+        # --- Manage Animations ---
+        self.player_sprite.on_update(delta_time)
+
     def update(self, delta_time):
         """ Movement and game logic """
+        # record the player's last location to get their true speed
+        self.player_last_x = self.player_sprite.center_x
 
         # Move the player with the physics engine
         self.physics_engine.update()
+
+        # get player's speed and update backgrounds
+        player_speed = self.player_sprite.center_x - self.player_last_x
+        self.bg_list.update(player_speed, self.player_sprite.center_x)
 
         # --- Manage Scrolling ---
 
@@ -184,7 +211,23 @@ class MyGame(arcade.View):
             if wall.center_x < self.player_sprite.center_x - 800:
                 wall.center_x = farthest_tile + (self.player_sprite._get_width() / 4)
 
-        # Confirm that the player sprite does not pass the coin
-        if arcade.check_for_collision(self.player_sprite, self.coin):
-            self.coin.center_x += 1250
-            self.coin.center_y = random.choice([150, 350, 550])
+        if answers := arcade.check_for_collision_with_list(self.player_sprite, self.answer_sprites):
+            # check if player hit the correct answer
+            is_correct = False
+            for answer in answers:
+                if type(answer) == Answer:
+                    a: Answer = answer
+                    if a.is_correct:
+                        is_correct = True
+
+            # player hit the correct answer
+            if is_correct:
+                pass
+
+            # move and reset answers
+            for answer in self.answer_sprites:
+                if type(answer) == Answer:
+                    a: Answer = answer
+                    a.center_x += 1250
+                    a.set_number(random.choice(list(range(-100, 100))))
+                    a.is_correct = False
