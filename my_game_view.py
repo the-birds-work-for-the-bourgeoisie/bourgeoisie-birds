@@ -37,7 +37,7 @@ class MyGame(arcade.View):
         # These are 'lists' that keep track of our sprites. Each sprite should
         # go into a list.
         self.wall_list = None
-        self.bg_list = Background(PLAYER_MOVEMENT_SPEED, self.level)
+        self.bg_list = None
         self.answer_sprites = SpriteList()
 
         # Separate variable that holds the player sprite
@@ -69,6 +69,7 @@ class MyGame(arcade.View):
 
         # Create the Sprite lists
         self.wall_list = arcade.SpriteList()
+        self.bg_list = Background(PLAYER_MOVEMENT_SPEED, self.level)
 
         # Set up the player, specifically placing it at these coordinates.
         image_source = "assets-target/pixelbird2/"
