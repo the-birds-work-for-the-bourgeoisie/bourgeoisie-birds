@@ -33,6 +33,6 @@ class Answer(arcade.Sprite):
     def _get_texture(self) -> Texture:
         img = Image.new('RGBA', (150, 150), color=(0, 0, 0, 0))
         d = ImageDraw.Draw(img)
-        fnt = ImageFont.truetype('/Library/Fonts/Arial.ttf', 70)
+        fnt = ImageFont.truetype('arial.ttf', 70)
         d.text((10, 10), self._text, fill=(0, 0, 0, 255), font=fnt)
         return Texture(name="Answer{%s}" % self._text, image=img)
