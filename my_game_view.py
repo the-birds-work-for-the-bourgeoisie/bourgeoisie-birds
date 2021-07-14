@@ -163,6 +163,14 @@ class MyGame(arcade.View):
 
     def update(self, delta_time):
         """ Movement and game logic """
+        # Stop the player from leaving the screen
+        if self.player_sprite.center_y > 600:
+            self.player_sprite.change_y = 0
+            self.player_sprite.center_y = 599
+        elif self.player_sprite.center_y < 25:
+            self.player_sprite.change_y = 0
+            self.player_sprite.center_y = 26
+
         # record the player's last location to get their true speed
         self.player_last_x = self.player_sprite.center_x
 
