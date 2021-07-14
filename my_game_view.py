@@ -122,16 +122,6 @@ class MyGame(arcade.View):
         self.player_sprite.draw()
         self.answer_sprites.draw()
 
-        arcade.draw_text("10",
-                         900 + self.view_left, 400 + self.view_bottom,
-                         arcade.color.WHITE, 20)
-        arcade.draw_text("15",
-                         900 + self.view_left, 600 + self.view_bottom,
-                         arcade.color.WHITE, 20)
-        arcade.draw_text("20",
-                         900 + self.view_left, 200 + self.view_bottom,
-                         arcade.color.WHITE, 20)
-
     def on_key_press(self, key, modifiers):
         """Called whenever a key is pressed. """
 
