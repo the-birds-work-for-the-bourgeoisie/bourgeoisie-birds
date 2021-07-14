@@ -20,7 +20,7 @@ PLAYER_MOVEMENT_SPEED = 5
 # How many pixels to keep as a minimum margin between the character
 # and the edge of the screen.
 LEFT_VIEWPORT_MARGIN = 250
-RIGHT_VIEWPORT_MARGIN = 250
+RIGHT_VIEWPORT_MARGIN = 750
 BOTTOM_VIEWPORT_MARGIN = 50
 TOP_VIEWPORT_MARGIN = 100
 
@@ -75,7 +75,7 @@ class MyGame(arcade.View):
         # Set up the player, specifically placing it at these coordinates.
         image_source = "assets-target/pixelbird2/"
         self.player_sprite = Bird(image_source, CHARACTER_SCALING)
-        self.player_sprite.center_x = 400
+        self.player_sprite.center_x = 250
         self.player_sprite.center_y = 150
         self.player_sprite.change_x = PLAYER_MOVEMENT_SPEED
 
