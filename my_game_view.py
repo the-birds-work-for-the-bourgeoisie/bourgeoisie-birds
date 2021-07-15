@@ -11,6 +11,7 @@ from sprites.answer import Answer
 from sprites.bird import Bird
 
 from background_handler import Background
+from sprites.sky_scraper import SkyScraper
 
 CHARACTER_SCALING = 1
 TILE_SCALING = 0.5
@@ -42,6 +43,7 @@ class MyGame(arcade.View):
         self.wall_list = None
         self.bg_list = None
         self.answer_sprites = SpriteList()
+        self.sky_scraper_sprites = SpriteList()
 
         # Separate variable that holds the player sprite
         self.player_sprite = None
@@ -100,6 +102,16 @@ class MyGame(arcade.View):
             answer.set_number(20)
             self.answer_sprites.append(answer)
 
+        # create the sky scrapers
+        sky_scraper = SkyScraper()
+        sky_scraper.center_x = 1000
+        sky_scraper.center_y = SCREEN_HEIGHT // 2
+        self.sky_scraper_sprites.append(sky_scraper)
+        sky_scraper2 = SkyScraper()
+        sky_scraper2.center_x = 1000 + 1250
+        sky_scraper2.center_y = SCREEN_HEIGHT // 2
+        self.sky_scraper_sprites.append(sky_scraper2)
+
         # Create the 'physics engine'
         self.physics_engine = arcade.PhysicsEnginePlatformer(self.player_sprite,
                                                              self.wall_list,
@@ -113,9 +125,10 @@ class MyGame(arcade.View):
 
         # Draw our sprites
         self.bg_list.draw()
+        self.sky_scraper_sprites.draw()
         self.wall_list.draw()
-        self.player_sprite.draw()
         self.answer_sprites.draw()
+        self.player_sprite.draw()
         self.draw_stats()
 
     def on_key_press(self, key, modifiers):
@@ -215,6 +228,8 @@ class MyGame(arcade.View):
                     a.center_x += 1250
                     a.set_number(random.choice(list(range(-100, 100))))
                     a.is_correct = True
+            self.sky_scraper_sprites[-1].center_x += 1250
+            self.sky_scraper_sprites.reverse()
 
     def draw_stats(self):
         start_x = SCREEN_WIDTH + self.view_left
