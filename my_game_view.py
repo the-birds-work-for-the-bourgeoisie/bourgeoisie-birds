@@ -22,7 +22,7 @@ PLAYER_MOVEMENT_SPEED = 5
 # How many pixels to keep as a minimum margin between the character
 # and the edge of the screen.
 LEFT_VIEWPORT_MARGIN = 250
-RIGHT_VIEWPORT_MARGIN = 250
+RIGHT_VIEWPORT_MARGIN = SCREEN_WIDTH - LEFT_VIEWPORT_MARGIN
 BOTTOM_VIEWPORT_MARGIN = 50
 TOP_VIEWPORT_MARGIN = 100
 
@@ -125,10 +125,10 @@ class MyGame(arcade.View):
             self.player_sprite.change_y = PLAYER_MOVEMENT_SPEED
         elif key == arcade.key.DOWN or key == arcade.key.S:
             self.player_sprite.change_y = -PLAYER_MOVEMENT_SPEED
-        elif key == arcade.key.LEFT:
-            self.player_sprite.change_x = -PLAYER_MOVEMENT_SPEED
-        elif key == arcade.key.RIGHT:
-            self.player_sprite.change_x = PLAYER_MOVEMENT_SPEED
+        # elif key == arcade.key.LEFT:
+        #     self.player_sprite.change_x = -PLAYER_MOVEMENT_SPEED
+        # elif key == arcade.key.RIGHT:
+        #     self.player_sprite.change_x = PLAYER_MOVEMENT_SPEED
 
     def on_key_release(self, key, modifiers):
         """Called when the user releases a key. """
@@ -137,10 +137,10 @@ class MyGame(arcade.View):
             self.player_sprite.change_y = 0
         elif key == arcade.key.DOWN or key == arcade.key.S:
             self.player_sprite.change_y = 0
-        elif key == arcade.key.LEFT:
-            self.player_sprite.change_x = 0
-        elif key == arcade.key.RIGHT:
-            self.player_sprite.change_x = 0
+        # elif key == arcade.key.LEFT:
+        #     self.player_sprite.change_x = 0
+        # elif key == arcade.key.RIGHT:
+        #     self.player_sprite.change_x = 0
 
     def on_update(self, delta_time: float):
 
