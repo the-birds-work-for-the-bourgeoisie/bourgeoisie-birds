@@ -20,7 +20,7 @@ PLAYER_MOVEMENT_SPEED = 5
 # How many pixels to keep as a minimum margin between the character
 # and the edge of the screen.
 LEFT_VIEWPORT_MARGIN = 250
-RIGHT_VIEWPORT_MARGIN = 250
+RIGHT_VIEWPORT_MARGIN = 750
 BOTTOM_VIEWPORT_MARGIN = 50
 TOP_VIEWPORT_MARGIN = 100
 
@@ -37,6 +37,7 @@ class MyGame(arcade.View):
         # These are 'lists' that keep track of our sprites. Each sprite should
         # go into a list.
         self.wall_list = None
+
         self.bg_list = None
         self.answer_sprites = SpriteList()
 
@@ -74,10 +75,11 @@ class MyGame(arcade.View):
         # Set up the player, specifically placing it at these coordinates.
         image_source = "assets-target/pixelbird2/"
         self.player_sprite = Bird(image_source, CHARACTER_SCALING)
-        self.player_sprite.center_x = 400
+        self.player_sprite.center_x = 250
         self.player_sprite.center_y = 150
         self.player_sprite.change_x = PLAYER_MOVEMENT_SPEED
 
+        # Load in map
         map_name = "firstMap.tmx"
         platforms_layer_name = "Tile Layer 1"
         my_map = arcade.tilemap.read_tmx(map_name)
@@ -86,8 +88,14 @@ class MyGame(arcade.View):
                                                       scaling=1,
                                                       use_spatial_hash=True)
 
+        # Turns the tiles on the top and bottom invisible
+        for i in self.wall_list:
+            if i.center_y > 600 or i.center_y < 200:
+                i.alpha = 0
+
         if my_map.background_color:
             arcade.set_background_color(my_map.background_color)
+
 
         ys = [150, 350, 550]
         for i in range(3):
@@ -145,6 +153,14 @@ class MyGame(arcade.View):
 
     def update(self, delta_time):
         """ Movement and game logic """
+        # Stop the player from leaving the screen
+        if self.player_sprite.center_y > 600:
+            self.player_sprite.change_y = 0
+            self.player_sprite.center_y = 599
+        elif self.player_sprite.center_y < 25:
+            self.player_sprite.change_y = 0
+            self.player_sprite.center_y = 26
+
         # record the player's last location to get their true speed
         self.player_last_x = self.player_sprite.center_x
 
@@ -183,15 +199,15 @@ class MyGame(arcade.View):
                                 self.view_bottom,
                                 SCREEN_HEIGHT + self.view_bottom)
 
-        greatest = 0
-
+        # Find the tile with the greatest x-coordinate
+        farthest_tile = 0
         for wall in self.wall_list:
-            if wall.center_x > greatest:
-                greatest = wall.center_x
-
+            if wall.center_x > farthest_tile:
+                farthest_tile = wall.center_x
+        # Place offscreen tiles ahead of the player sprite
         for wall in self.wall_list:
             if wall.center_x < self.player_sprite.center_x - 800:
-                wall.center_x = greatest + (self.player_sprite._get_width() / 4)
+                wall.center_x = farthest_tile + (self.player_sprite._get_width() / 4)
 
         if answers := arcade.check_for_collision_with_list(self.player_sprite, self.answer_sprites):
             # check if player hit the correct answer
