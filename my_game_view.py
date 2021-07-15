@@ -242,6 +242,7 @@ class MyGame(arcade.View):
                 if type(answer) == Answer:
                     a: Answer = answer
                     a.center_x += 1250
+                    # TODO: EQUATION GENERATOR
                     a.set_number(random.choice(list(range(-100, 100))))
                     a.is_correct = True
             self.sky_scraper_sprites[-1].center_x += 1250
@@ -258,3 +259,5 @@ class MyGame(arcade.View):
         arcade.draw_xywh_rectangle_filled(start_x - number_width, start_y - 100, width=100, height=100, color=arcade.color.BLACK)
         arcade.draw_text(str(self.score), start_x, start_y, arcade.color.WHITE, font_size,
                          anchor_x="right", anchor_y="top")
+
+    # TODO: DRAW EQUATION
