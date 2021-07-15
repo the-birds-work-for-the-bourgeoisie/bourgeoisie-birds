@@ -1,8 +1,10 @@
+import math
+
 import arcade
 import random
 
 # Constants used to scale our sprites from their original size
-from arcade import SpriteList
+from arcade import SpriteList, Sprite
 
 from constants import SCREEN_WIDTH, SCREEN_HEIGHT
 from sprites.answer import Answer
@@ -33,6 +35,7 @@ class MyGame(arcade.View):
     def __init__(self, level: int = 1):
         super().__init__()
 
+        self.score: int = 0
         self.level = level
         # These are 'lists' that keep track of our sprites. Each sprite should
         # go into a list.
@@ -113,6 +116,7 @@ class MyGame(arcade.View):
         self.wall_list.draw()
         self.player_sprite.draw()
         self.answer_sprites.draw()
+        self.draw_stats()
 
     def on_key_press(self, key, modifiers):
         """Called whenever a key is pressed. """
@@ -193,18 +197,17 @@ class MyGame(arcade.View):
             if wall.center_x < self.player_sprite.center_x - 800:
                 wall.center_x = greatest + (self.player_sprite._get_width() / 4)
 
-        if answers := arcade.check_for_collision_with_list(self.player_sprite, self.answer_sprites):
-            # check if player hit the correct answer
+        closest_sprite: Sprite = arcade.get_closest_sprite(self.player_sprite, self.answer_sprites)[0]
+        if type(closest_sprite) == Answer and self.player_sprite.left > closest_sprite.left:
+            print("hello")
+            answer: Answer = closest_sprite
             is_correct = False
-            for answer in answers:
-                if type(answer) == Answer:
-                    a: Answer = answer
-                    if a.is_correct:
-                        is_correct = True
+            if answer.is_correct:
+                is_correct = True
 
             # player hit the correct answer
             if is_correct:
-                pass
+                self.score += 1
 
             # move and reset answers
             for answer in self.answer_sprites:
@@ -212,4 +215,16 @@ class MyGame(arcade.View):
                     a: Answer = answer
                     a.center_x += 1250
                     a.set_number(random.choice(list(range(-100, 100))))
-                    a.is_correct = False
+                    a.is_correct = True
+
+    def draw_stats(self):
+        start_x = SCREEN_WIDTH + self.view_left
+        start_y = SCREEN_HEIGHT
+        font_size = 20
+        if self.score > 0:
+            number_width = math.floor(math.log10(self.score) + 1) * font_size
+        else:
+            number_width = 1 * font_size
+        arcade.draw_xywh_rectangle_filled(start_x - number_width, start_y - 100, width=100, height=100, color=arcade.color.BLACK)
+        arcade.draw_text(str(self.score), start_x, start_y, arcade.color.WHITE, font_size,
+                         anchor_x="right", anchor_y="top")
