@@ -199,7 +199,6 @@ class MyGame(arcade.View):
 
         closest_sprite: Sprite = arcade.get_closest_sprite(self.player_sprite, self.answer_sprites)[0]
         if type(closest_sprite) == Answer and self.player_sprite.left > closest_sprite.left:
-            print("hello")
             answer: Answer = closest_sprite
             is_correct = False
             if answer.is_correct:
