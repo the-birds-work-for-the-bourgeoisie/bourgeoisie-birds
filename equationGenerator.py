@@ -143,3 +143,4 @@ class Equation:
         # the correct answer itself is not in this set!
         setPossible.add(incorrect_a)
         setPossible.add(incorrect_b)
+        setPossible.add(self.answer)
