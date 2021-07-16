@@ -8,7 +8,9 @@ To start the software, the user needs to run `main.py`. A screen will pull up wi
 
 The program was written in Python 3.9. To run the basic mechanics and create a physics engine for the player sprite and environment to interact together, we used the Python Arcade library.
 
-{Describe the programming language that you used and any libraries.}
+* VsCode
+* PyCharm
+* Heroku
 
 # Collaborators
 
