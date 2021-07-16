@@ -77,14 +77,6 @@ class MyGame(arcade.View):
         self.current_equation = Equation(self.level)
         self.current_answer_set = set()
         self.current_equation.setIncorrectAnswers(self.current_answer_set)
-        # self.current_answer_set.add(self.current_equation.answer)
-
-        for i in range(10000):
-            self.next_equation = Equation(self.level)
-            self.next_answer_set = set()
-            self.next_equation.setIncorrectAnswers(self.next_answer_set)
-            print(len(self.next_answer_set), self.next_answer_set)
-            assert len(self.next_answer_set) == 3
 
         # Initialize the next equation generator
         self.next_equation = Equation(self.level)
@@ -243,7 +235,6 @@ class MyGame(arcade.View):
         if self.player_sprite.right > right_boundary:
             self.view_left += self.player_sprite.right - right_boundary
             changed = True
-            self.is_dead = True
 
         if changed:
             # Only scroll to integers. Otherwise we end up with pixels that
@@ -256,32 +247,18 @@ class MyGame(arcade.View):
                                 SCREEN_WIDTH + self.view_left,
                                 self.view_bottom,
                                 SCREEN_HEIGHT + self.view_bottom)
-
+        
         for wall in self.wall_list:
-            if wall.center_x > greatest:
-                greatest = wall.center_x
-
-        for wall in self.wall_list:
-            if wall.center_x < self.player_sprite.center_x - 800:
-                wall.center_x = greatest + (self.player_sprite._get_width() / 4)
-
-        if arcade.check_for_collision(self.player_sprite, self.barrier):
-            self.barrier.center_x += 1250
-            self.barrier.center_y = random.choice([150, 350, 550])
-
-        if self.is_dead:
-            arcade.play_sound(self.dying_sound_2)
-            time.sleep(1)
-            new_view = game_over.GameOver()
-            self.window.show_view(new_view)
-
-        if self.won:
-            arcade.play_sound(self.courage_sound)
-            time.sleep(1)
-            new_view = game_won.GameWon()
-            self.window.show_view(new_view)
             if wall.center_x < self.player_sprite.center_x - 500:
-                wall.center_x += 2500
+                wall.center_x += 1250
+
+        # if self.won:
+        #     arcade.play_sound(self.courage_sound)
+        #     time.sleep(1)
+        #     new_view = game_won.GameWon()
+        #     self.window.show_view(new_view)
+        #     if wall.center_x < self.player_sprite.center_x - 500:
+        #         wall.center_x += 2500
 
         closest_sprite: Sprite = arcade.get_closest_sprite(self.player_sprite, self.answer_sprites)[0]
         if type(closest_sprite) == Answer and self.player_sprite.left > closest_sprite.left:
@@ -293,6 +270,7 @@ class MyGame(arcade.View):
                 # Reset the equation and answers
                 self.get_new_equation()
             else:
+                print(answer.is_correct, answer.get_number())
                 self.kill_bird()
 
             # move answers
@@ -306,6 +284,7 @@ class MyGame(arcade.View):
                 value = values[i]
                 a.set_number(value)
                 a.is_correct = self.current_equation.answer == value
+                print(value, a.is_correct)
 
             sprite: SkyScraper = self.sky_scraper_sprites.pop(0)
             sprite.move_forward(how_many=2)
@@ -313,12 +292,17 @@ class MyGame(arcade.View):
 
         # bird death detection
         if player_speed == 0:
+            print("SPEED 0")
             self.kill_bird()
 
     def kill_bird(self):
         # TODO: Show end screen
         self.dead = True
         print("DEAD BIRD")
+        arcade.play_sound(self.dying_sound_2)
+        time.sleep(1)
+        new_view = game_over.GameOver()
+        self.window.show_view(new_view)
 
     def draw_stats(self):
         start_x = SCREEN_WIDTH + self.view_left
