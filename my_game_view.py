@@ -245,8 +245,8 @@ class MyGame(arcade.View):
                     # TODO: EQUATION GENERATOR
                     a.set_number(random.choice(list(range(-100, 100))))
                     a.is_correct = True
-            sprite = self.sky_scraper_sprites.pop(0)
-            sprite.center_x += 1250 * 2
+            sprite: SkyScraper = self.sky_scraper_sprites.pop(0)
+            sprite.move_forward(how_many=2)
             self.sky_scraper_sprites.append(sprite)
 
         # bird death detection
