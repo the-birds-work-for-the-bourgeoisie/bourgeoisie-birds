@@ -148,10 +148,10 @@ class MyGame(arcade.View):
             self.player_sprite.change_y = PLAYER_MOVEMENT_SPEED
         elif key == arcade.key.DOWN or key == arcade.key.S:
             self.player_sprite.change_y = -PLAYER_MOVEMENT_SPEED
-        elif key == arcade.key.LEFT:
-            self.player_sprite.change_x = -PLAYER_MOVEMENT_SPEED
-        elif key == arcade.key.RIGHT:
-            self.player_sprite.change_x = PLAYER_MOVEMENT_SPEED
+        # elif key == arcade.key.LEFT:
+        #     self.player_sprite.change_x = -PLAYER_MOVEMENT_SPEED
+        # elif key == arcade.key.RIGHT:
+        #     self.player_sprite.change_x = PLAYER_MOVEMENT_SPEED
 
     def on_key_release(self, key, modifiers):
         """Called when the user releases a key. """
@@ -160,10 +160,10 @@ class MyGame(arcade.View):
             self.player_sprite.change_y = 0
         elif key == arcade.key.DOWN or key == arcade.key.S:
             self.player_sprite.change_y = 0
-        elif key == arcade.key.LEFT:
-            self.player_sprite.change_x = 0
-        elif key == arcade.key.RIGHT:
-            self.player_sprite.change_x = 0
+        # elif key == arcade.key.LEFT:
+        #     self.player_sprite.change_x = 0
+        # elif key == arcade.key.RIGHT:
+        #     self.player_sprite.change_x = 0
 
     def on_update(self, delta_time: float):
 
@@ -227,6 +227,7 @@ class MyGame(arcade.View):
             answer: Answer = closest_sprite
             is_correct = False
             if answer.get_number() == self.current_equation.answer:
+            # if answer.is_correct:
                 is_correct = True
 
             # player hit the correct answer
