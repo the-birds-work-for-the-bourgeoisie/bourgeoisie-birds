@@ -9,6 +9,7 @@ answers, you'd have to create a whole new Equation object.
 
 import random
 from collections import Set
+from typing import List
 
 
 class Equation:
@@ -20,6 +21,7 @@ class Equation:
         self.range = 10
         self.isAddition = True
         self.can_be_negative = False
+        self.answers: List[int] = []
 
         # just addition, numbers 10 or less
         if difficulty == 0:
@@ -76,6 +78,9 @@ class Equation:
         else:
             self.answer = self.var_x - self.var_y
 
+        # create default answer set
+        self.next_answer_set()
+
 
     """
     Returns a string containing the unsolved problem.
@@ -114,7 +119,7 @@ class Equation:
 
     Now test_set has two incorrect choices. 
     """
-    def get_next_answer_set(self) -> Set[int]:
+    def next_answer_set(self) -> Set[int]:
         set_possible = set()
         # initialize two incorrect answers 
         incorrect_a = 0
@@ -153,4 +158,4 @@ class Equation:
             "Incorrect length. Expected 3, got %i items in set(%s) with items [%i, %i, %i]" %\
             (len(set_possible), ", ".join([str(i) for i in set_possible]), incorrect_a, incorrect_b, self.answer)
 
-        return set_possible
+        self.answers = list(set_possible)

@@ -1,23 +1,18 @@
 import math
+import time
+from typing import List
 
 import arcade
-import random
-from arcade.gui import UIManager
-from buttons.my_flat_button import MyFlatButton
-import level_select
-import game_over
-import game_won
-import time
-
 # Constants used to scale our sprites from their original size
 from arcade import SpriteList, Sprite
+from arcade.gui import UIManager
 
+import game_over
+from background_handler import Background
 from constants import SCREEN_WIDTH, SCREEN_HEIGHT
+from equationGenerator import Equation
 from sprites.answer import Answer
 from sprites.bird import Bird
-from equationGenerator import Equation
-
-from background_handler import Background
 from sprites.sky_scraper import SkyScraper
 
 CHARACTER_SCALING = 1
@@ -25,7 +20,7 @@ TILE_SCALING = 0.4
 COIN_SCALING = 0.5
 
 # Movement speed of player, in pixels per frame
-PLAYER_MOVEMENT_SPEED = 4
+PLAYER_MOVEMENT_SPEED = 6
 
 # How many pixels to keep as a minimum margin between the character
 # and the edge of the screen.
@@ -33,7 +28,7 @@ LEFT_VIEWPORT_MARGIN = 250
 RIGHT_VIEWPORT_MARGIN = SCREEN_WIDTH - LEFT_VIEWPORT_MARGIN
 BOTTOM_VIEWPORT_MARGIN = 50
 TOP_VIEWPORT_MARGIN = 100
-STARTING_X_OFFSET = 200
+STARTING_X_OFFSET = 500
 
 
 class MyGame(arcade.View):
@@ -43,7 +38,6 @@ class MyGame(arcade.View):
 
     def __init__(self, level: int = 1):
         super().__init__()
-
         self.score: int = 0
         self.level = level
         # These are 'lists' that keep track of our sprites. Each sprite should
@@ -73,13 +67,10 @@ class MyGame(arcade.View):
         # keeps track of the player sprite's location from previous frame
         self.player_last_x = 0
 
-        # Initialize equation generator
-        self.current_equation = Equation(self.level)
-        self.current_answer_set = self.current_equation.get_next_answer_set()
-
-        # Initialize the next equation generator
-        self.next_equation = Equation(self.level)
-        self.next_answer_set = self.next_equation.get_next_answer_set()
+        # Initialize equations
+        self.equations: List[Equation] = []  # First is current
+        for i in range(3):
+            self.equations.append(Equation(self.level))
 
         # Load sounds
         self.collect_coin_sound = arcade.load_sound(":resources:sounds/coin1.wav")
@@ -94,7 +85,6 @@ class MyGame(arcade.View):
 
     def setup(self):
         """ Set up the game here. Call this function to restart the game. """
-
         # Used to keep track of our scrolling
         self.view_bottom = 0
         self.view_left = 0
@@ -131,7 +121,7 @@ class MyGame(arcade.View):
             316,
             516
         ]
-        values = list(self.current_answer_set)
+        values = self.equations[0].answers
         for i in range(3):
             answer = Answer(COIN_SCALING)
             answer.center_x = 920 + STARTING_X_OFFSET
@@ -142,12 +132,17 @@ class MyGame(arcade.View):
         # create the sky scrapers
         center_x = STARTING_X_OFFSET + 920 - 1250 * 2
         center_y = SCREEN_HEIGHT // 2
+        print([e.answers for e in self.equations])
         for i in range(3):
-            sky_scraper = SkyScraper()
+            values = self.equations[(i - 1) % len(self.equations)].answers
+            sky_scraper = SkyScraper(values, id=i)
             sky_scraper.center_x = center_x
             sky_scraper.center_y = center_y
             center_x = sky_scraper.move_forward()
             self.sky_scraper_sprites.append(sky_scraper)
+            if i == 0:
+                # make the first invisible temporarily so it doesn't get in the way
+                sky_scraper.scale = 0
 
         # Create the 'physics engine'
         self.physics_engine = arcade.PhysicsEnginePlatformer(self.player_sprite,
@@ -164,10 +159,10 @@ class MyGame(arcade.View):
         self.wall_list.draw()  # invisible
         self.bg_list.draw()
         self.sky_scraper_sprites.draw()
-        self.answer_sprites.draw()
         self.player_sprite.draw()
         self.draw_stats()
-        arcade.draw_text(self.current_equation.equationUnsolved(), 500 + self.view_left, 600 + self.view_bottom, arcade.csscolor.WHITE, 18)
+        self.answer_sprites.draw()  # invisible
+        arcade.draw_text(self.equations[0].equationUnsolved(), 500 + self.view_left, 600 + self.view_bottom, arcade.csscolor.WHITE, 18)
 
     def on_key_press(self, key, modifiers):
         """Called whenever a key is pressed. """
@@ -258,35 +253,42 @@ class MyGame(arcade.View):
         #     if wall.center_x < self.player_sprite.center_x - 500:
         #         wall.center_x += 2500
 
+        # manage threads
+        for i in range(len(self.sky_scraper_sprites)):
+            ss: SkyScraper = self.sky_scraper_sprites[i]
+            if not ss.thread.is_alive() and not ss.loaded:
+                ss.load_image()
+        current_equation = self.equations[0]
         closest_sprite: Sprite = arcade.get_closest_sprite(self.player_sprite, self.answer_sprites)[0]
         if type(closest_sprite) == Answer and self.player_sprite.left > closest_sprite.left:
             answer: Answer = closest_sprite
 
             # player hit the correct answer
-            is_correct = answer.get_number() == self.current_equation.answer
-            if is_correct:
+            if answer.get_number() == current_equation.answer:
                 self.score += 1
                 # Reset the equation and answers
                 self.get_new_equation()
+                current_equation = self.equations[0]
             else:
                 self.kill_bird()
 
             # move answers
-            print(self.current_answer_set)
-            values = list(self.current_answer_set)
-            print("debug", values, self.current_equation.answer, self.current_equation.equationUnsolved())
+            values = current_equation.answers
             for i in range(len(self.answer_sprites)):
                 a: Answer = self.answer_sprites[i]
                 a.center_x += 1250
-                print(values)
                 value = values[i]
                 a.set_number(value)
-                a.is_correct = self.current_equation.answer == value
-                print(value, a.is_correct)
+                a.is_correct = current_equation.answer == value
 
             sprite: SkyScraper = self.sky_scraper_sprites.pop(0)
-            sprite.move_forward(how_many=3)
-            self.sky_scraper_sprites.append(sprite)
+            center = (sprite.center_x, sprite.center_y)
+            print("reloading", [e.answers for e in self.equations])
+            new_sprite = SkyScraper(self.equations[1].answers, id=sprite.id)
+            new_sprite.center_x = center[0]
+            new_sprite.center_y = center[1]
+            new_sprite.move_forward(how_many=3)
+            self.sky_scraper_sprites.append(new_sprite)
 
         # bird death detection
         if player_speed == 0:
@@ -298,7 +300,7 @@ class MyGame(arcade.View):
         print("Bird died")
         arcade.play_sound(self.dying_sound_2)
         time.sleep(1)
-        new_view = game_over.GameOver()
+        new_view = game_over.GameOver(self)
         self.window.show_view(new_view)
 
     def draw_stats(self):
@@ -314,9 +316,6 @@ class MyGame(arcade.View):
                          anchor_x="right", anchor_y="top")
 
     def get_new_equation(self):
-        # Set current equation to next equation
-        self.current_equation = self.next_equation
-        self.current_answer_set = self.next_answer_set
-        # Reset the next equation
-        self.next_equation = Equation(self.level)
-        self.next_answer_set = self.next_equation.get_next_answer_set()
+        self.equations.pop(0)
+        self.equations.append(Equation(self.level))
+        print("get_new_equation", [e.answers for e in self.equations])

@@ -12,7 +12,6 @@ class Answer(arcade.Sprite):
 
     def __init__(self, scale: float = ANSWER_SCALING):
         super().__init__(scale=scale)
-        # is_correct is used to detect if it is the right answer
         self._value = 0
         self._text = "0"
         self.texture = self._get_texture()
