@@ -12,6 +12,7 @@ from sprites.bird import Bird
 from equationGenerator import Equation
 
 from background_handler import Background
+from sprites.sky_scraper import SkyScraper
 
 CHARACTER_SCALING = 1
 TILE_SCALING = 0.5
@@ -44,6 +45,8 @@ class MyGame(arcade.View):
 
         self.bg_list = None
         self.answer_sprites = SpriteList()
+        self.sky_scraper_sprites = SpriteList()
+        self.dead: bool = False
 
         # Separate variable that holds the player sprite
         self.player_sprite = None
@@ -122,6 +125,16 @@ class MyGame(arcade.View):
             answer.set_number(self.current_answer_set.pop())
             self.answer_sprites.append(answer)
 
+        # create the sky scrapers
+        center_x = 1000 - 1250 * 2
+        center_y = SCREEN_HEIGHT // 2
+        for i in range(3):
+            sky_scraper = SkyScraper()
+            sky_scraper.center_x = center_x
+            sky_scraper.center_y = center_y
+            center_x = sky_scraper.move_forward()
+            self.sky_scraper_sprites.append(sky_scraper)
+
         # Create the 'physics engine'
         self.physics_engine = arcade.PhysicsEnginePlatformer(self.player_sprite,
                                                              self.wall_list,
@@ -135,9 +148,10 @@ class MyGame(arcade.View):
 
         # Draw our sprites
         self.bg_list.draw()
+        self.sky_scraper_sprites.draw()
         self.wall_list.draw()
-        self.player_sprite.draw()
         self.answer_sprites.draw()
+        self.player_sprite.draw()
         self.draw_stats()
         arcade.draw_text(self.current_equation.equationUnsolved(), 500 + self.view_left, 600 + self.view_bottom, arcade.csscolor.WHITE, 18)
 
@@ -217,7 +231,7 @@ class MyGame(arcade.View):
                                 SCREEN_WIDTH + self.view_left,
                                 self.view_bottom,
                                 SCREEN_HEIGHT + self.view_bottom)
-        
+
         for wall in self.wall_list:
             if wall.center_x < self.player_sprite.center_x - 500:
                 wall.center_x += 2500
@@ -225,16 +239,14 @@ class MyGame(arcade.View):
         closest_sprite: Sprite = arcade.get_closest_sprite(self.player_sprite, self.answer_sprites)[0]
         if type(closest_sprite) == Answer and self.player_sprite.left > closest_sprite.left:
             answer: Answer = closest_sprite
-            is_correct = False
-            if answer.get_number() == self.current_equation.answer:
-            # if answer.is_correct:
-                is_correct = True
 
             # player hit the correct answer
-            if is_correct:
+            if answer.is_correct:
                 self.score += 1
                 # Reset the equation
                 self.get_new_equation()
+            else:
+                self.kill_bird()
 
             # move and reset answers
             for answer in self.answer_sprites:
@@ -243,6 +255,18 @@ class MyGame(arcade.View):
                     a.center_x += 1250
                     a.set_number(self.current_answer_set.pop())
                     a.is_correct = True
+            sprite: SkyScraper = self.sky_scraper_sprites.pop(0)
+            sprite.move_forward(how_many=2)
+            self.sky_scraper_sprites.append(sprite)
+
+        # bird death detection
+        if player_speed == 0:
+            self.kill_bird()
+
+    def kill_bird(self):
+        # TODO: Show end screen
+        self.dead = True
+        print("DEAD BIRD")
 
     def draw_stats(self):
         start_x = SCREEN_WIDTH + self.view_left
