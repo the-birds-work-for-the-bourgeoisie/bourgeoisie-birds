@@ -113,11 +113,11 @@ class MyGame(arcade.View):
 
         # create the sky scrapers
         sky_scraper = SkyScraper()
-        sky_scraper.center_x = 1000
+        sky_scraper.center_x = 1000 - 1250
         sky_scraper.center_y = SCREEN_HEIGHT // 2
         self.sky_scraper_sprites.append(sky_scraper)
         sky_scraper2 = SkyScraper()
-        sky_scraper2.center_x = 1000 + 1250
+        sky_scraper2.center_x = 1000
         sky_scraper2.center_y = SCREEN_HEIGHT // 2
         self.sky_scraper_sprites.append(sky_scraper2)
 
@@ -245,8 +245,9 @@ class MyGame(arcade.View):
                     # TODO: EQUATION GENERATOR
                     a.set_number(random.choice(list(range(-100, 100))))
                     a.is_correct = True
-            self.sky_scraper_sprites[-1].center_x += 1250
-            self.sky_scraper_sprites.reverse()
+            sprite = self.sky_scraper_sprites.pop(0)
+            sprite.center_x += 1250 * 2
+            self.sky_scraper_sprites.append(sprite)
 
         # bird death detection
         if player_speed == 0:
