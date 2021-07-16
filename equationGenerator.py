@@ -8,6 +8,8 @@ answers, you'd have to create a whole new Equation object.
 """
 
 import random
+from collections import Set
+
 
 class Equation:
     def __init__(self, difficulty):
@@ -17,7 +19,7 @@ class Equation:
         # difficulty determines range and operation
         self.range = 10
         self.isAddition = True
-        self.canBeNegative = False
+        self.can_be_negative = False
 
         # just addition, numbers 10 or less
         if difficulty == 0:
@@ -42,14 +44,14 @@ class Equation:
         if difficulty == 3:
             if random.randrange(2):
                 self.isAddition = False
-                self.canBeNegative = True
+                self.can_be_negative = True
 
         # addition/subtraction, numbers less than 20, answers can be negative 
         if difficulty == 4:
             self.range = 20
             if random.randrange(2):
                 self.isAddition = False
-                self.canBeNegative = True
+                self.can_be_negative = True
 
         """
         Generates the equation based on difficulty.  
@@ -61,7 +63,7 @@ class Equation:
         self.problem = None # will be used in later methods
         
         # no negative answers for difficulties 2 and below 
-        if self.isAddition == False and self.canBeNegative == False:
+        if self.isAddition == False and self.can_be_negative == False:
             # if the second is higher than the first, just swamp 'em
             if self.var_y > self.var_x:
                 temp = self.var_x
@@ -112,7 +114,8 @@ class Equation:
 
     Now test_set has two incorrect choices. 
     """
-    def setIncorrectAnswers(self, setPossible):
+    def get_next_answer_set(self) -> Set[int]:
+        set_possible = set()
         # initialize two incorrect answers 
         incorrect_a = 0
         incorrect_b = 0
@@ -120,7 +123,7 @@ class Equation:
         # randomly pick incorrect_a's value 
         if random.randrange(0, 1):
             # this incorrect answer is one away from the actual one 
-            if not self.canBeNegative and self.answer - 1 <= 0:
+            if not self.can_be_negative and self.answer - 1 <= 0:
                 incorrect_a = (self.answer + 1)
             else:
                 if random.randrange(0, 1):
@@ -143,7 +146,11 @@ class Equation:
 
         # add these two numbers to the set; remember, 
         # the correct answer itself is not in this set!
-        print(incorrect_a, incorrect_b, self.answer)
-        setPossible.add(incorrect_a)
-        setPossible.add(incorrect_b)
-        setPossible.add(self.answer)
+        set_possible.add(incorrect_a)
+        set_possible.add(incorrect_b)
+        set_possible.add(self.answer)
+        assert len(set_possible) == 3,\
+            "Incorrect length. Expected 3, got %i items in set(%s) with items [%i, %i, %i]" %\
+            (len(set_possible), ", ".join([str(i) for i in set_possible]), incorrect_a, incorrect_b, self.answer)
+
+        return set_possible

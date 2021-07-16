@@ -21,7 +21,7 @@ from background_handler import Background
 from sprites.sky_scraper import SkyScraper
 
 CHARACTER_SCALING = 1
-TILE_SCALING = 0.5
+TILE_SCALING = 0.4
 COIN_SCALING = 0.5
 
 # Movement speed of player, in pixels per frame
@@ -33,6 +33,7 @@ LEFT_VIEWPORT_MARGIN = 250
 RIGHT_VIEWPORT_MARGIN = SCREEN_WIDTH - LEFT_VIEWPORT_MARGIN
 BOTTOM_VIEWPORT_MARGIN = 50
 TOP_VIEWPORT_MARGIN = 100
+STARTING_X_OFFSET = 200
 
 
 class MyGame(arcade.View):
@@ -72,16 +73,13 @@ class MyGame(arcade.View):
         # keeps track of the player sprite's location from previous frame
         self.player_last_x = 0
 
-
         # Initialize equation generator
         self.current_equation = Equation(self.level)
-        self.current_answer_set = set()
-        self.current_equation.setIncorrectAnswers(self.current_answer_set)
+        self.current_answer_set = self.current_equation.get_next_answer_set()
 
         # Initialize the next equation generator
         self.next_equation = Equation(self.level)
-        self.next_answer_set = set()
-        self.next_equation.setIncorrectAnswers(self.next_answer_set)
+        self.next_answer_set = self.next_equation.get_next_answer_set()
 
         # Load sounds
         self.collect_coin_sound = arcade.load_sound(":resources:sounds/coin1.wav")
@@ -109,40 +107,36 @@ class MyGame(arcade.View):
         image_source = "assets-target/pixelbird2/"
         self.player_sprite = Bird(image_source, CHARACTER_SCALING)
         self.player_sprite.center_x = 250
-        self.player_sprite.center_y = 150
+        self.player_sprite.center_y = SCREEN_HEIGHT // 2
         self.player_sprite.change_x = PLAYER_MOVEMENT_SPEED
 
-        # Load in map
-        map_name = "firstMap.tmx"
-        platforms_layer_name = "Tile Layer 1"
-        my_map = arcade.tilemap.read_tmx(map_name)
-        self.wall_list = arcade.tilemap.process_layer(map_object=my_map,
-                                                      layer_name=platforms_layer_name,
-                                                      scaling=1,
-                                                      use_spatial_hash=True)
-        new_list = arcade.tilemap.process_layer(map_object=my_map,
-                                                      layer_name=platforms_layer_name,
-                                                      scaling=1,
-                                                      use_spatial_hash=True)
-        for i in new_list:
-            i.center_x += 1250
-            self.wall_list.append(i)
-
-        if my_map.background_color:
-            arcade.set_background_color(my_map.background_color)
-
+        # Load in walls (invisible)
+        self.wall_list = SpriteList()
+        wall_offset = STARTING_X_OFFSET + 830
+        create_wall_list = lambda x_offset = 0: [
+            Sprite("stoneMid.png",
+                   scale=TILE_SCALING,
+                   center_x=wall_offset + x_offset,
+                   center_y=SCREEN_HEIGHT // 2 - 100),
+            Sprite("stoneMid.png",
+                   scale=TILE_SCALING,
+                   center_x=wall_offset + x_offset,
+                   center_y=SCREEN_HEIGHT // 2 + 100),
+        ]
+        self.wall_list.extend(create_wall_list())
+        self.wall_list.extend(create_wall_list(1250))
 
         ys = [150, 350, 550]
         values = list(self.current_answer_set)
         for i in range(3):
             answer = Answer(COIN_SCALING)
-            answer.center_x = 1000
+            answer.center_x = 920 + STARTING_X_OFFSET
             answer.center_y = ys[i]
             answer.set_number(values[i])
             self.answer_sprites.append(answer)
 
         # create the sky scrapers
-        center_x = 920 - 1250 * 2
+        center_x = STARTING_X_OFFSET + 920 - 1250 * 2
         center_y = SCREEN_HEIGHT // 2
         for i in range(3):
             sky_scraper = SkyScraper()
@@ -163,9 +157,9 @@ class MyGame(arcade.View):
         arcade.start_render()
 
         # Draw our sprites
+        self.wall_list.draw()  # invisible
         self.bg_list.draw()
         self.sky_scraper_sprites.draw()
-        self.wall_list.draw()
         self.answer_sprites.draw()
         self.player_sprite.draw()
         self.draw_stats()
@@ -265,12 +259,12 @@ class MyGame(arcade.View):
             answer: Answer = closest_sprite
 
             # player hit the correct answer
-            if answer.is_correct:
+            is_correct = answer.get_number() == self.current_equation.answer
+            if is_correct:
                 self.score += 1
                 # Reset the equation and answers
                 self.get_new_equation()
             else:
-                print(answer.is_correct, answer.get_number())
                 self.kill_bird()
 
             # move answers
@@ -292,13 +286,12 @@ class MyGame(arcade.View):
 
         # bird death detection
         if player_speed == 0:
-            print("SPEED 0")
+            print("Bird hit the wall")
             self.kill_bird()
 
     def kill_bird(self):
-        # TODO: Show end screen
         self.dead = True
-        print("DEAD BIRD")
+        print("Bird died")
         arcade.play_sound(self.dying_sound_2)
         time.sleep(1)
         new_view = game_over.GameOver()
@@ -320,11 +313,6 @@ class MyGame(arcade.View):
         # Set current equation to next equation
         self.current_equation = self.next_equation
         self.current_answer_set = self.next_answer_set
-        print(len(self.current_answer_set), self.current_answer_set)
-        assert len(self.current_answer_set) == 3
         # Reset the next equation
         self.next_equation = Equation(self.level)
-        self.next_answer_set = set()
-        self.next_equation.setIncorrectAnswers(self.next_answer_set)
-        print(len(self.next_answer_set), self.next_answer_set)
-        assert len(self.next_answer_set) == 3
+        self.next_answer_set = self.next_equation.get_next_answer_set()
