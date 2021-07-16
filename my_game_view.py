@@ -45,6 +45,7 @@ class MyGame(arcade.View):
         self.bg_list = None
         self.answer_sprites = SpriteList()
         self.sky_scraper_sprites = SpriteList()
+        self.dead: bool = False
 
         # Separate variable that holds the player sprite
         self.player_sprite = None
@@ -229,13 +230,12 @@ class MyGame(arcade.View):
         closest_sprite: Sprite = arcade.get_closest_sprite(self.player_sprite, self.answer_sprites)[0]
         if type(closest_sprite) == Answer and self.player_sprite.left > closest_sprite.left:
             answer: Answer = closest_sprite
-            is_correct = False
-            if answer.is_correct:
-                is_correct = True
 
             # player hit the correct answer
-            if is_correct:
+            if answer.is_correct:
                 self.score += 1
+            else:
+                self.kill_bird()
 
             # move and reset answers
             for answer in self.answer_sprites:
@@ -247,6 +247,15 @@ class MyGame(arcade.View):
                     a.is_correct = True
             self.sky_scraper_sprites[-1].center_x += 1250
             self.sky_scraper_sprites.reverse()
+
+        # bird death detection
+        if player_speed == 0:
+            self.kill_bird()
+
+    def kill_bird(self):
+        # TODO: Show end screen
+        self.dead = True
+        print("DEAD BIRD")
 
     def draw_stats(self):
         start_x = SCREEN_WIDTH + self.view_left
