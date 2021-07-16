@@ -2,6 +2,12 @@ import math
 
 import arcade
 import random
+from arcade.gui import UIManager
+from buttons.my_flat_button import MyFlatButton
+import level_select
+import game_over
+import game_won
+import time
 
 # Constants used to scale our sprites from their original size
 from arcade import SpriteList, Sprite
@@ -51,6 +57,8 @@ class MyGame(arcade.View):
         # Separate variable that holds the player sprite
         self.player_sprite = None
 
+        self.ui_manager = UIManager()
+
         # Our physics engine
         self.physics_engine = None
 
@@ -58,6 +66,9 @@ class MyGame(arcade.View):
         self.view_bottom = 0
         self.view_left = 0
 
+        self.is_dead = False
+        self.won = False
+        self.sound = arcade.Sound("sound_files/dying2.mp3", True)
         # keeps track of the player sprite's location from previous frame
         self.player_last_x = 0
 
@@ -83,6 +94,10 @@ class MyGame(arcade.View):
         # Load sounds
         self.collect_coin_sound = arcade.load_sound(":resources:sounds/coin1.wav")
         self.jump_sound = arcade.load_sound(":resources:sounds/jump1.wav")
+        self.courage_sound = arcade.load_sound("sound_files/courage screech.mp3")
+        self.dying_sound_1 = arcade.load_sound("sound_files/dying1.mp3")
+        self.dying_sound_2 = arcade.load_sound("sound_files/dying2.mp3")
+        self.music1 = arcade.load_sound("sound_files/music1.mp3")
 
         arcade.set_background_color(arcade.csscolor.CORNFLOWER_BLUE)
         self.setup()
@@ -228,6 +243,7 @@ class MyGame(arcade.View):
         if self.player_sprite.right > right_boundary:
             self.view_left += self.player_sprite.right - right_boundary
             changed = True
+            self.is_dead = True
 
         if changed:
             # Only scroll to integers. Otherwise we end up with pixels that
@@ -242,6 +258,28 @@ class MyGame(arcade.View):
                                 SCREEN_HEIGHT + self.view_bottom)
 
         for wall in self.wall_list:
+            if wall.center_x > greatest:
+                greatest = wall.center_x
+
+        for wall in self.wall_list:
+            if wall.center_x < self.player_sprite.center_x - 800:
+                wall.center_x = greatest + (self.player_sprite._get_width() / 4)
+
+        if arcade.check_for_collision(self.player_sprite, self.barrier):
+            self.barrier.center_x += 1250
+            self.barrier.center_y = random.choice([150, 350, 550])
+
+        if self.is_dead:
+            arcade.play_sound(self.dying_sound_2)
+            time.sleep(1)
+            new_view = game_over.GameOver()
+            self.window.show_view(new_view)
+
+        if self.won:
+            arcade.play_sound(self.courage_sound)
+            time.sleep(1)
+            new_view = game_won.GameWon()
+            self.window.show_view(new_view)
             if wall.center_x < self.player_sprite.center_x - 500:
                 wall.center_x += 2500
 
