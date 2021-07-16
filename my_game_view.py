@@ -9,6 +9,7 @@ from arcade import SpriteList, Sprite
 from constants import SCREEN_WIDTH, SCREEN_HEIGHT
 from sprites.answer import Answer
 from sprites.bird import Bird
+from equationGenerator import Equation
 
 from background_handler import Background
 
@@ -57,6 +58,17 @@ class MyGame(arcade.View):
         # keeps track of the player sprite's location from previous frame
         self.player_last_x = 0
 
+        # Initialize equation generator
+        self.current_equation = Equation(self.level)
+        self.current_answer_set = set()
+        self.current_equation.setIncorrectAnswers(self.current_answer_set)
+        # self.current_answer_set.add(self.current_equation.answer)
+
+        # Initialize the next equation generator
+        self.next_equation = Equation(self.level)
+        self.next_answer_set = set()
+        self.next_equation.setIncorrectAnswers(self.next_answer_set)
+
         # Load sounds
         self.collect_coin_sound = arcade.load_sound(":resources:sounds/coin1.wav")
         self.jump_sound = arcade.load_sound(":resources:sounds/jump1.wav")
@@ -90,11 +102,13 @@ class MyGame(arcade.View):
                                                       layer_name=platforms_layer_name,
                                                       scaling=1,
                                                       use_spatial_hash=True)
-
-        # Turns the tiles on the top and bottom invisible
-        for i in self.wall_list:
-            if i.center_y > 600 or i.center_y < 200:
-                i.alpha = 0
+        new_list = arcade.tilemap.process_layer(map_object=my_map,
+                                                      layer_name=platforms_layer_name,
+                                                      scaling=1,
+                                                      use_spatial_hash=True)
+        for i in new_list:
+            i.center_x += 1250
+            self.wall_list.append(i)
 
         if my_map.background_color:
             arcade.set_background_color(my_map.background_color)
@@ -105,7 +119,7 @@ class MyGame(arcade.View):
             answer = Answer(COIN_SCALING)
             answer.center_x = 1000
             answer.center_y = ys[i]
-            answer.set_number(20)
+            answer.set_number(self.current_answer_set.pop())
             self.answer_sprites.append(answer)
 
         # Create the 'physics engine'
@@ -125,6 +139,7 @@ class MyGame(arcade.View):
         self.player_sprite.draw()
         self.answer_sprites.draw()
         self.draw_stats()
+        arcade.draw_text(self.current_equation.equationUnsolved(), 500 + self.view_left, 600 + self.view_bottom, arcade.csscolor.WHITE, 18)
 
     def on_key_press(self, key, modifiers):
         """Called whenever a key is pressed. """
@@ -133,10 +148,10 @@ class MyGame(arcade.View):
             self.player_sprite.change_y = PLAYER_MOVEMENT_SPEED
         elif key == arcade.key.DOWN or key == arcade.key.S:
             self.player_sprite.change_y = -PLAYER_MOVEMENT_SPEED
-        # elif key == arcade.key.LEFT:
-        #     self.player_sprite.change_x = -PLAYER_MOVEMENT_SPEED
-        # elif key == arcade.key.RIGHT:
-        #     self.player_sprite.change_x = PLAYER_MOVEMENT_SPEED
+        elif key == arcade.key.LEFT:
+            self.player_sprite.change_x = -PLAYER_MOVEMENT_SPEED
+        elif key == arcade.key.RIGHT:
+            self.player_sprite.change_x = PLAYER_MOVEMENT_SPEED
 
     def on_key_release(self, key, modifiers):
         """Called when the user releases a key. """
@@ -145,10 +160,10 @@ class MyGame(arcade.View):
             self.player_sprite.change_y = 0
         elif key == arcade.key.DOWN or key == arcade.key.S:
             self.player_sprite.change_y = 0
-        # elif key == arcade.key.LEFT:
-        #     self.player_sprite.change_x = 0
-        # elif key == arcade.key.RIGHT:
-        #     self.player_sprite.change_x = 0
+        elif key == arcade.key.LEFT:
+            self.player_sprite.change_x = 0
+        elif key == arcade.key.RIGHT:
+            self.player_sprite.change_x = 0
 
     def on_update(self, delta_time: float):
 
@@ -202,34 +217,30 @@ class MyGame(arcade.View):
                                 SCREEN_WIDTH + self.view_left,
                                 self.view_bottom,
                                 SCREEN_HEIGHT + self.view_bottom)
-
-        # Find the tile with the greatest x-coordinate
-        farthest_tile = 0
+        
         for wall in self.wall_list:
-            if wall.center_x > farthest_tile:
-                farthest_tile = wall.center_x
-        # Place offscreen tiles ahead of the player sprite
-        for wall in self.wall_list:
-            if wall.center_x < self.player_sprite.center_x - 800:
-                wall.center_x = farthest_tile + (self.player_sprite._get_width() / 4)
+            if wall.center_x < self.player_sprite.center_x - 500:
+                wall.center_x += 2500
 
         closest_sprite: Sprite = arcade.get_closest_sprite(self.player_sprite, self.answer_sprites)[0]
         if type(closest_sprite) == Answer and self.player_sprite.left > closest_sprite.left:
             answer: Answer = closest_sprite
             is_correct = False
-            if answer.is_correct:
+            if answer.get_number() == self.current_equation.answer:
                 is_correct = True
 
             # player hit the correct answer
             if is_correct:
                 self.score += 1
+                # Reset the equation
+                self.get_new_equation()
 
             # move and reset answers
             for answer in self.answer_sprites:
                 if type(answer) == Answer:
                     a: Answer = answer
                     a.center_x += 1250
-                    a.set_number(random.choice(list(range(-100, 100))))
+                    a.set_number(self.current_answer_set.pop())
                     a.is_correct = True
 
     def draw_stats(self):
@@ -243,3 +254,12 @@ class MyGame(arcade.View):
         arcade.draw_xywh_rectangle_filled(start_x - number_width, start_y - 100, width=100, height=100, color=arcade.color.BLACK)
         arcade.draw_text(str(self.score), start_x, start_y, arcade.color.WHITE, font_size,
                          anchor_x="right", anchor_y="top")
+
+    def get_new_equation(self):
+        # Set current equation to next equation
+        self.current_equation = self.next_equation
+        self.current_answer_set = self.next_answer_set
+        # Reset the next equation
+        self.next_equation = Equation(self.level)
+        self.next_answer_set = set()
+        self.next_equation.setIncorrectAnswers(self.next_answer_set)
