@@ -3,7 +3,7 @@
  <tileset firstgid="1" source="stoneTiles.tsx"/>
  <layer id="1" name="Tile Layer 1" width="50" height="21">
   <data encoding="base64" compression="zlib">
-   eJztl0EKwCAMBKNiC83//9scLEhB2FTbiuzAQA4mJAcPG0QkAEbwnddsbube2ZsB67439OzS6iWEfI+aB+jMrHIHIaQN+sf1rwVBVrmDEDIPV2ZNznpUltUyNz2cFcuMe65E61FZtrZnzgmcPQSA
+   eJzt06ENADAMA8Hg7D9wUVWU8lh3kgd44CoArv5sk5QOYJby85QOAJ4Dag8BGQ==
   </data>
  </layer>
 </map>
