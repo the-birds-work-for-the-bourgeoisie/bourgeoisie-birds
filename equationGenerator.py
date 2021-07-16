@@ -120,7 +120,7 @@ class Equation:
         # randomly pick incorrect_a's value 
         if random.randrange(0, 1):
             # this incorrect answer is one away from the actual one 
-            if self.canBeNegative == False and self.answer - 1 <= 0:
+            if not self.canBeNegative and self.answer - 1 <= 0:
                 incorrect_a = (self.answer + 1)
             else:
                 if random.randrange(0, 1):
@@ -136,11 +136,14 @@ class Equation:
 
         # incorrect_b is a random number close to the answer
         incorrect_b = random.randrange(self.answer - 5, self.answer + 5)
-        while incorrect_b == self.answer:
+        while incorrect_b == self.answer or incorrect_a == incorrect_b:
             incorrect_b = random.randrange(self.answer - 5, self.answer + 5)
+        while incorrect_a == self.answer or incorrect_a == incorrect_b:
+            incorrect_a = random.randrange(self.answer - 5, self.answer + 5)
 
         # add these two numbers to the set; remember, 
         # the correct answer itself is not in this set!
+        print(incorrect_a, incorrect_b, self.answer)
         setPossible.add(incorrect_a)
         setPossible.add(incorrect_b)
         setPossible.add(self.answer)

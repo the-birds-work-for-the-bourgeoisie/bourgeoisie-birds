@@ -61,11 +61,19 @@ class MyGame(arcade.View):
         # keeps track of the player sprite's location from previous frame
         self.player_last_x = 0
 
+
         # Initialize equation generator
         self.current_equation = Equation(self.level)
         self.current_answer_set = set()
         self.current_equation.setIncorrectAnswers(self.current_answer_set)
         # self.current_answer_set.add(self.current_equation.answer)
+
+        for i in range(10000):
+            self.next_equation = Equation(self.level)
+            self.next_answer_set = set()
+            self.next_equation.setIncorrectAnswers(self.next_answer_set)
+            print(len(self.next_answer_set), self.next_answer_set)
+            assert len(self.next_answer_set) == 3
 
         # Initialize the next equation generator
         self.next_equation = Equation(self.level)
@@ -118,15 +126,16 @@ class MyGame(arcade.View):
 
 
         ys = [150, 350, 550]
+        values = list(self.current_answer_set)
         for i in range(3):
             answer = Answer(COIN_SCALING)
             answer.center_x = 1000
             answer.center_y = ys[i]
-            answer.set_number(self.current_answer_set.pop())
+            answer.set_number(values[i])
             self.answer_sprites.append(answer)
 
         # create the sky scrapers
-        center_x = 1000 - 1250 * 2
+        center_x = 920 - 1250 * 2
         center_y = SCREEN_HEIGHT // 2
         for i in range(3):
             sky_scraper = SkyScraper()
@@ -243,18 +252,23 @@ class MyGame(arcade.View):
             # player hit the correct answer
             if answer.is_correct:
                 self.score += 1
-                # Reset the equation
+                # Reset the equation and answers
                 self.get_new_equation()
             else:
                 self.kill_bird()
 
-            # move and reset answers
-            for answer in self.answer_sprites:
-                if type(answer) == Answer:
-                    a: Answer = answer
-                    a.center_x += 1250
-                    a.set_number(self.current_answer_set.pop())
-                    a.is_correct = True
+            # move answers
+            print(self.current_answer_set)
+            values = list(self.current_answer_set)
+            print("debug", values, self.current_equation.answer, self.current_equation.equationUnsolved())
+            for i in range(len(self.answer_sprites)):
+                a: Answer = self.answer_sprites[i]
+                a.center_x += 1250
+                print(values)
+                value = values[i]
+                a.set_number(value)
+                a.is_correct = self.current_equation.answer == value
+
             sprite: SkyScraper = self.sky_scraper_sprites.pop(0)
             sprite.move_forward(how_many=2)
             self.sky_scraper_sprites.append(sprite)
@@ -284,7 +298,11 @@ class MyGame(arcade.View):
         # Set current equation to next equation
         self.current_equation = self.next_equation
         self.current_answer_set = self.next_answer_set
+        print(len(self.current_answer_set), self.current_answer_set)
+        assert len(self.current_answer_set) == 3
         # Reset the next equation
         self.next_equation = Equation(self.level)
         self.next_answer_set = set()
         self.next_equation.setIncorrectAnswers(self.next_answer_set)
+        print(len(self.next_answer_set), self.next_answer_set)
+        assert len(self.next_answer_set) == 3
