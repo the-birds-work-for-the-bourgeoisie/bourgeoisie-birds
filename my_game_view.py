@@ -2,6 +2,7 @@ import math
 
 import arcade
 import random
+import time
 
 # Constants used to scale our sprites from their original size
 from arcade import SpriteList, Sprite
@@ -276,6 +277,13 @@ class MyGame(arcade.View):
         # bird death detection
         if player_speed == 0:
             self.kill_bird()
+            
+        if self.dead:
+            arcade.play_sound(self.dying_sound_2)
+            time.sleep(2)
+            new_view = game_over.GameOver()
+            self.window.show_view(new_view)
+            
 
     def kill_bird(self):
         # TODO: Show end screen
