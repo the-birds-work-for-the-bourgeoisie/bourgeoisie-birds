@@ -9,12 +9,8 @@ from arcade.gui import UIManager
 
 from buttons.my_flat_button import MyFlatButton
 from my_game_view import MyGame
+from constants import SCREEN_WIDTH, SCREEN_HEIGHT
 
-# Define the constants
-
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
-SCREEN_TITLE = "BIRDS OF THE BORDUASIE"
 
 class LevelSelect(arcade.View):
     def __init__(self, ):
@@ -50,10 +46,10 @@ class LevelSelect(arcade.View):
         button.set_style_attrs(
             font_color=arcade.color.WHITE,
             font_color_hover=arcade.color.BLACK,
-            font_color_press=arcade.color.WHITE,
+            font_color_press=arcade.color.BLACK,
             bg_color=(169, 169, 169),
             bg_color_hover=(255, 0, 0),
-            bg_color_press=(122, 21, 24),
+            bg_color_press=arcade.color.WHITE,
             border_color=arcade.color.BLACK,
             border_color_hover=arcade.color.BLACK,
             border_color_press=arcade.color.WHITE
@@ -73,10 +69,10 @@ class LevelSelect(arcade.View):
         button.set_style_attrs(
             font_color=arcade.color.WHITE,
             font_color_hover=arcade.color.BLACK,
-            font_color_press=arcade.color.WHITE,
+            font_color_press=arcade.color.BLACK,
             bg_color=(169, 169, 169),
             bg_color_hover=(255, 255, 0),
-            bg_color_press=(122, 21, 24),
+            bg_color_press=arcade.color.WHITE,
             border_color=arcade.color.BLACK,
             border_color_hover=arcade.color.BLACK,
             border_color_press=arcade.color.WHITE
@@ -84,7 +80,7 @@ class LevelSelect(arcade.View):
         button.add_event_listener(self.level2)
         self.ui_manager.add_ui_element(button)
         
-        # Button for level 1
+        # Button for level 1S
         button = MyFlatButton(
             text='Level 1',
             center_x=250,
@@ -95,10 +91,10 @@ class LevelSelect(arcade.View):
         button.set_style_attrs(
             font_color=arcade.color.WHITE,
             font_color_hover=arcade.color.BLACK,
-            font_color_press=arcade.color.WHITE,
+            font_color_press=arcade.color.BLACK,
             bg_color=(169, 169, 169),
             bg_color_hover=(0, 255, 0),
-            bg_color_press=(122, 21, 24),
+            bg_color_press=arcade.color.WHITE,
             border_color=arcade.color.BLACK,
             border_color_hover=arcade.color.BLACK,
             border_color_press=arcade.color.WHITE

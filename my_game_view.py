@@ -1,5 +1,11 @@
 import arcade
 import random
+from arcade.gui import UIManager
+from buttons.my_flat_button import MyFlatButton
+import level_select
+import game_over
+import game_won
+import time
 
 # Constants used to scale our sprites from their original size
 from constants import SCREEN_WIDTH, SCREEN_HEIGHT
@@ -36,6 +42,8 @@ class MyGame(arcade.View):
         # Separate variable that holds the player sprite
         self.player_sprite = None
 
+        self.ui_manager = UIManager()
+
         # Our physics engine
         self.physics_engine = None
 
@@ -43,9 +51,17 @@ class MyGame(arcade.View):
         self.view_bottom = 0
         self.view_left = 0
 
+        self.is_dead = False
+        self.won = False
+        self.sound = arcade.Sound("sound_files/dying2.mp3", True)
+
         # Load sounds
         self.collect_coin_sound = arcade.load_sound(":resources:sounds/coin1.wav")
         self.jump_sound = arcade.load_sound(":resources:sounds/jump1.wav")
+        self.courage_sound = arcade.load_sound("sound_files/courage screech.mp3")
+        self.dying_sound_1 = arcade.load_sound("sound_files/dying1.mp3")
+        self.dying_sound_2 = arcade.load_sound("sound_files/dying2.mp3")
+        self.music1 = arcade.load_sound("sound_files/music1.mp3")
 
         arcade.set_background_color(arcade.csscolor.CORNFLOWER_BLUE)
         self.setup()
@@ -134,7 +150,7 @@ class MyGame(arcade.View):
             self.player_sprite.change_x = 0
 
     def update(self, delta_time):
-        """ Movement and game logic """
+        """ Movement and game loop """            
 
         # Move the player with the physics engine
         self.physics_engine.update()
@@ -154,6 +170,7 @@ class MyGame(arcade.View):
         if self.player_sprite.right > right_boundary:
             self.view_left += self.player_sprite.right - right_boundary
             changed = True
+            self.is_dead = True
 
         if changed:
             # Only scroll to integers. Otherwise we end up with pixels that
@@ -180,3 +197,15 @@ class MyGame(arcade.View):
         if arcade.check_for_collision(self.player_sprite, self.barrier):
             self.barrier.center_x += 1250
             self.barrier.center_y = random.choice([150, 350, 550])
+
+        if self.is_dead:
+            arcade.play_sound(self.dying_sound_2)
+            time.sleep(1)
+            new_view = game_over.GameOver()
+            self.window.show_view(new_view)
+
+        if self.won:
+            arcade.play_sound(self.courage_sound)
+            time.sleep(1)
+            new_view = game_won.GameWon()
+            self.window.show_view(new_view)
