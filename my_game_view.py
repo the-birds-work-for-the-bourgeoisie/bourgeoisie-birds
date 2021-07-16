@@ -25,7 +25,7 @@ TILE_SCALING = 0.4
 COIN_SCALING = 0.5
 
 # Movement speed of player, in pixels per frame
-PLAYER_MOVEMENT_SPEED = 5
+PLAYER_MOVEMENT_SPEED = 4
 
 # How many pixels to keep as a minimum margin between the character
 # and the edge of the screen.
@@ -126,7 +126,11 @@ class MyGame(arcade.View):
         self.wall_list.extend(create_wall_list())
         self.wall_list.extend(create_wall_list(1250))
 
-        ys = [150, 350, 550]
+        ys = [
+            116,
+            316,
+            516
+        ]
         values = list(self.current_answer_set)
         for i in range(3):
             answer = Answer(COIN_SCALING)
@@ -281,7 +285,7 @@ class MyGame(arcade.View):
                 print(value, a.is_correct)
 
             sprite: SkyScraper = self.sky_scraper_sprites.pop(0)
-            sprite.move_forward(how_many=2)
+            sprite.move_forward(how_many=3)
             self.sky_scraper_sprites.append(sprite)
 
         # bird death detection
