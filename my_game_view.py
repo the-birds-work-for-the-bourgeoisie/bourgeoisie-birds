@@ -112,14 +112,14 @@ class MyGame(arcade.View):
             self.answer_sprites.append(answer)
 
         # create the sky scrapers
-        sky_scraper = SkyScraper()
-        sky_scraper.center_x = 1000 - 1250
-        sky_scraper.center_y = SCREEN_HEIGHT // 2
-        self.sky_scraper_sprites.append(sky_scraper)
-        sky_scraper2 = SkyScraper()
-        sky_scraper2.center_x = 1000
-        sky_scraper2.center_y = SCREEN_HEIGHT // 2
-        self.sky_scraper_sprites.append(sky_scraper2)
+        center_x = 1000 - 1250 * 2
+        center_y = SCREEN_HEIGHT // 2
+        for i in range(3):
+            sky_scraper = SkyScraper()
+            sky_scraper.center_x = center_x
+            sky_scraper.center_y = center_y
+            center_x = sky_scraper.move_forward()
+            self.sky_scraper_sprites.append(sky_scraper)
 
         # Create the 'physics engine'
         self.physics_engine = arcade.PhysicsEnginePlatformer(self.player_sprite,
