@@ -38,4 +38,3 @@ Here's the [video](https://youtu.be/5uaCG2lvE9w) that inspired this game.
 * Bird enters screen from the left each time the players restarts the game.
 * Create additional bird sprites the player can play as.
 * Make the UI more colorful
-* Item 3
