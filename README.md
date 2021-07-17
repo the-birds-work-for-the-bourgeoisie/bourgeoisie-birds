@@ -33,8 +33,6 @@ To start the software, the user needs to run `main.py`. A screen will pull up wi
 
 # Future Work
 
-{Make a list of things that you need to fix, improve, and add in the future.}
-
-* Create additional sprites the player can play as.
+* Bird enters screen from the left each time the players restarts the game.
 * Item 2
 * Item 3
