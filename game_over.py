@@ -81,5 +81,5 @@ class GameOver(arcade.View):
         self.window.show_view(self.game_view)
 
     def level_select(self):
-        new_view = level_select.LevelSelect()
+        new_view = level_select.LevelSelect(self.game_view)
         self.window.show_view(new_view)

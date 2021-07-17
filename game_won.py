@@ -10,10 +10,12 @@ from buttons.my_flat_button import MyFlatButton
 import level_select
 from constants import SCREEN_HEIGHT, SCREEN_WIDTH
 
+
 class GameWon(arcade.View):
-    def __init__(self, ):
+    def __init__(self, game_view):
         super().__init__()
         self.ui_manager = UIManager()
+        self.game_view = game_view
 
     def on_hide_view(self):
         self.ui_manager.unregister_handlers()
@@ -30,7 +32,7 @@ class GameWon(arcade.View):
         right_column_x = 3 * self.window.width // 4
         print("Setup")
         self.ui_manager.purge_ui_elements()
-        
+
         # Button for level 2
         button = MyFlatButton(
             app=self,
@@ -51,13 +53,11 @@ class GameWon(arcade.View):
         )
         button.add_event_listener(self.level_select)
         self.ui_manager.add_ui_element(button)
-        
+
     def on_draw(self):
         arcade.start_render()
         arcade.draw_text("Level Complete!", 275, 450, arcade.color.BLUE, font_size=50)
 
     def level_select(self):
-        new_view = level_select.LevelSelect()
+        new_view = level_select.LevelSelect(self.game_view)
         self.window.show_view(new_view)
-
-

@@ -43,11 +43,11 @@ class MyGame(arcade.View):
         # These are 'lists' that keep track of our sprites. Each sprite should
         # go into a list.
         self.wall_list = None
+        self.wall_counter = 0
 
         self.bg_list = None
-        self.answer_sprites = SpriteList()
-        self.sky_scraper_sprites = SpriteList()
-        self.dead: bool = False
+        self.answer_sprites = None
+        self.sky_scraper_sprites = None
 
         # Separate variable that holds the player sprite
         self.player_sprite = None
@@ -68,9 +68,7 @@ class MyGame(arcade.View):
         self.player_last_x = 0
 
         # Initialize equations
-        self.equations: List[Equation] = []  # First is current
-        for i in range(3):
-            self.equations.append(Equation(self.level))
+        self.equations: List[Equation] = None  # First is current
 
         # Load sounds
         self.collect_coin_sound = arcade.load_sound(":resources:sounds/coin1.wav")
@@ -84,7 +82,15 @@ class MyGame(arcade.View):
         self.setup()
 
     def setup(self):
+        self.is_dead = False
         """ Set up the game here. Call this function to restart the game. """
+        self.sky_scraper_sprites = SpriteList()
+        self.answer_sprites = SpriteList()
+
+        self.equations = []
+        for i in range(3):
+            self.equations.append(Equation(self.level))
+
         # Used to keep track of our scrolling
         self.view_bottom = 0
         self.view_left = 0
@@ -135,11 +141,14 @@ class MyGame(arcade.View):
         print([e.answers for e in self.equations])
         for i in range(3):
             values = self.equations[(i - 1) % len(self.equations)].answers
-            sky_scraper = SkyScraper(values, id=i)
+            sky_scraper = SkyScraper(values, id=self.wall_counter)
+            self.wall_counter += 1
             sky_scraper.center_x = center_x
             sky_scraper.center_y = center_y
             center_x = sky_scraper.move_forward()
+            print("hello!")
             self.sky_scraper_sprites.append(sky_scraper)
+            print("sky_scraper_sprites", len(self.sky_scraper_sprites))
             if i == 0:
                 # make the first invisible temporarily so it doesn't get in the way
                 sky_scraper.scale = 0
@@ -194,6 +203,9 @@ class MyGame(arcade.View):
         self.player_sprite.on_update(delta_time)
 
     def update(self, delta_time):
+        if self.is_dead:
+            print("CANCEELED")
+            return
         """ Movement and game logic """
         # Stop the player from leaving the screen
         if self.player_sprite.center_y > 600:
@@ -280,15 +292,16 @@ class MyGame(arcade.View):
                 value = values[i]
                 a.set_number(value)
                 a.is_correct = current_equation.answer == value
-
-            sprite: SkyScraper = self.sky_scraper_sprites.pop(0)
-            center = (sprite.center_x, sprite.center_y)
-            print("reloading", [e.answers for e in self.equations])
-            new_sprite = SkyScraper(self.equations[1].answers, id=sprite.id)
-            new_sprite.center_x = center[0]
-            new_sprite.center_y = center[1]
-            new_sprite.move_forward(how_many=3)
-            self.sky_scraper_sprites.append(new_sprite)
+            if len(self.sky_scraper_sprites) == 3:
+                sprite: SkyScraper = self.sky_scraper_sprites.pop(0)
+                center = (sprite.center_x, sprite.center_y)
+                print("reloading", [e.answers for e in self.equations])
+                new_sprite = SkyScraper(self.equations[1].answers, id=self.wall_counter)
+                self.wall_counter += 1
+                new_sprite.center_x = center[0]
+                new_sprite.center_y = center[1]
+                new_sprite.move_forward(how_many=3)
+                self.sky_scraper_sprites.append(new_sprite)
 
         # bird death detection
         if player_speed == 0:
@@ -296,12 +309,19 @@ class MyGame(arcade.View):
             self.kill_bird()
 
     def kill_bird(self):
-        self.dead = True
+        self.is_dead = True
         print("Bird died")
         arcade.play_sound(self.dying_sound_2)
-        time.sleep(1)
+        self.tear_down(self.sky_scraper_sprites)
+        self.tear_down(self.answer_sprites)
+        self.tear_down(self.wall_list)
         new_view = game_over.GameOver(self)
         self.window.show_view(new_view)
+
+    def tear_down(self, sprite_list: SpriteList):
+        for i in range(len(sprite_list)):
+            sprite = sprite_list.pop()
+            sprite.scale = 0
 
     def draw_stats(self):
         start_x = SCREEN_WIDTH + self.view_left
