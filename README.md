@@ -6,6 +6,7 @@ To start the software, the user needs to run `main.py`. A screen will pull up wi
 
 Here's the [video](https://youtu.be/5uaCG2lvE9w) that inspired this game.
 
+Video overview: https://youtu.be/yzwOiRYdrgA
 # Development Environment
 
 * Python 3.9
