@@ -2,12 +2,15 @@
 The level select screen.
 """
 # Import the needed modules
+import random
+from typing import List
 
 import arcade
 import arcade.gui
 from arcade.gui import UIManager
 
 from buttons.my_flat_button import MyFlatButton
+from highscore_api import get_high_scores, HighScore
 from my_game_view import MyGame
 from constants import SCREEN_WIDTH, SCREEN_HEIGHT
 
@@ -18,6 +21,7 @@ class LevelSelect(arcade.View):
         self.ui_manager = UIManager()
         self.awesome = 2
         self.game_view = game_view
+        self.high_scores: List[HighScore] = get_high_scores(str(random.randint(1, 1000000))) # avoid caches. Sigh
 
     def on_hide_view(self):
         self.ui_manager.unregister_handlers()
@@ -106,13 +110,16 @@ class LevelSelect(arcade.View):
     def on_draw(self):
         arcade.start_render()
         arcade.draw_text("Level Select Screen", 305, 475, arcade.color.PURPLE_MOUNTAIN_MAJESTY, font_size=40)
+        max_scores = 5
+        for i in range(min(len(self.high_scores), max_scores)):
+            high_score = self.high_scores[i]
+            arcade.draw_text("%s: %i" % (high_score.initials, high_score.score), SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 100 - i * 20, anchor_y="center", anchor_x="center", color=arcade.color.WHITE)
 
     def level(self, l: int):
         if self.game_view:
             self.game_view.setup()
             self.game_view.level = l
             self.window.show_view(self.game_view)
-
         else:
             new_view = MyGame(l)
             self.window.show_view(new_view)

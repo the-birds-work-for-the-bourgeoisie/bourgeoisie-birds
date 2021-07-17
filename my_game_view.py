@@ -173,8 +173,8 @@ class MyGame(arcade.View):
         self.draw_stats()
         w = 200
         h = 60
-        arcade.draw_xywh_rectangle_filled(SCREEN_WIDTH // 2 - w //2 + self.view_left, SCREEN_HEIGHT - h, width=w, height=h, color=arcade.color.BLACK)
-        arcade.draw_text(self.equations[0].equationUnsolved(), 500 + self.view_left, 600 + self.view_bottom, arcade.csscolor.WHITE, 18)
+        arcade.draw_xywh_rectangle_filled(SCREEN_WIDTH // 2 - w // 2 + self.view_left, SCREEN_HEIGHT - h, width=w, height=h, color=arcade.color.BLACK)
+        arcade.draw_text(self.equations[0].equationUnsolved(), self.view_left + SCREEN_WIDTH // 2, 600 + self.view_bottom, arcade.csscolor.WHITE, 18, anchor_x="center")
 
     def on_key_press(self, key, modifiers):
         """Called whenever a key is pressed. """
@@ -318,7 +318,7 @@ class MyGame(arcade.View):
         self.tear_down(self.sky_scraper_sprites)
         self.tear_down(self.answer_sprites)
         self.tear_down(self.wall_list)
-        new_view = game_over.GameOver(self)
+        new_view = game_over.GameOver(self, self.score)
         self.window.show_view(new_view)
 
     def tear_down(self, sprite_list: SpriteList):
