@@ -13,9 +13,10 @@ from constants import SCREEN_WIDTH, SCREEN_HEIGHT
 
 
 class GameOver(arcade.View):
-    def __init__(self, ):
+    def __init__(self, game_view):
         super().__init__()
         self.ui_manager = UIManager()
+        self.game_view = game_view
 
     def on_hide_view(self):
         self.ui_manager.unregister_handlers()
@@ -76,9 +77,9 @@ class GameOver(arcade.View):
         arcade.draw_text("Game Over", 350, 450, arcade.color.RED_DEVIL, font_size=50)
 
     def restart(self):
-        new_view = my_game_view.MyGame()
-        self.window.show_view(new_view)
+        self.game_view.setup()
+        self.window.show_view(self.game_view)
 
     def level_select(self):
-        new_view = level_select.LevelSelect()
+        new_view = level_select.LevelSelect(self.game_view)
         self.window.show_view(new_view)
