@@ -6,9 +6,9 @@ To start the software, the user needs to run `main.py`. A screen will pull up wi
 
 # Development Environment
 
-The program was written in Python 3.9. To run the basic mechanics and create a physics engine for the player sprite and environment to interact together, we used the Python Arcade library.
-
-* VsCode
+* Python 3.9
+* Python Arcade
+* VSCode
 * PyCharm
 * Heroku
 
