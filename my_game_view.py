@@ -165,12 +165,15 @@ class MyGame(arcade.View):
         arcade.start_render()
 
         # Draw our sprites
-        self.wall_list.draw()  # invisible
+        # self.wall_list.draw()  # invisible
+        # self.answer_sprites.draw()  # invisible
         self.bg_list.draw()
         self.sky_scraper_sprites.draw()
         self.player_sprite.draw()
         self.draw_stats()
-        self.answer_sprites.draw()  # invisible
+        w = 200
+        h = 60
+        arcade.draw_xywh_rectangle_filled(SCREEN_WIDTH // 2 - w //2 + self.view_left, SCREEN_HEIGHT - h, width=w, height=h, color=arcade.color.BLACK)
         arcade.draw_text(self.equations[0].equationUnsolved(), 500 + self.view_left, 600 + self.view_bottom, arcade.csscolor.WHITE, 18)
 
     def on_key_press(self, key, modifiers):
