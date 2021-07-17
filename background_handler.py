@@ -10,8 +10,6 @@ futher explained in said function.
 import arcade
 from arcade.sprite_list import SpriteList
 
-import random
-
 class Background(arcade.Sprite):
 
     """ 
@@ -27,14 +25,13 @@ class Background(arcade.Sprite):
         self.bg_building_list = SpriteList() # the two buildings (front)
         self.bg_all_list = SpriteList()      # all six sprites
 
-        # time of day randomly chosen between dawn, day, dusk, and night 
+        # time of day chosen based on level selected by user 
         self.theme = ""
-        time = random.randint(1, 4)
-        if time == 1:
+        if level == 1:
             self.theme = "day"
-        elif time == 2:
+        elif level == 2:
             self.theme = "dusk"
-        elif time == 3:
+        elif level == 3:
             self.theme = "night"
         else:
             self.theme = "dawn"
