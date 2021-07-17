@@ -1,4 +1,5 @@
 import dataclasses
+import random
 from dataclasses import dataclass
 from random import randint
 from typing import List
@@ -14,7 +15,7 @@ class HighScore:
     score: int
 
 
-def wake_up():
+def wake_up_server():
     """
     Wakes up the heroku server
     """
@@ -22,11 +23,11 @@ def wake_up():
     requests.get(url)
 
 
-def get_high_scores() -> List[HighScore]:
+def get_high_scores(cache) -> List[HighScore]:
     """
     Gets highest high scores from the heroku server
     """
-    url = _BASE_URL + '/high-score'
+    url = _BASE_URL + '/high-score?cache_burst=' + str(random.randint(1, 1000000))
     data = requests.get(url).json()
     return list(map(lambda d: HighScore(d['initials'], d['score']), data))
 
@@ -45,4 +46,4 @@ def put_high_score(high_score: HighScore) -> bool:
 if __name__ == "__main__":
     print("testing")
     print(put_high_score(HighScore("ADS", randint(1, 100))))
-    print(get_high_scores())
+    print(get_high_scores(209))
